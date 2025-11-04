@@ -1,0 +1,40 @@
+# version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: course_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: course_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    build: ./course-backend
+    container_name: course_backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/course_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+    ports:
+      - "8089:8089"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  frontend:
+    build: ./course-frontend
+    container_name: course_frontend
+    ports:
+      - "4800:4800"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:

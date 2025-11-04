@@ -1,0 +1,160 @@
+<div class="course-form-container">
+  <!-- Back Button -->
+  <div class="back-button actions-right">
+    <button mat-button class="app-btn app-btn--ghost" (click)="onCancel()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Courses
+    </button>
+  </div>
+  <!-- Header -->
+  <div class="form-header">
+    <h1>{{ pageTitle }}</h1>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Loading course data...</p>
+  </div>
+
+  <!-- Form -->
+  <mat-card *ngIf="!loading" class="course-form-card">
+    <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+      <mat-card-content>
+        <!-- Course Name -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Course Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter course name">
+          <mat-icon matPrefix>book</mat-icon>
+          <mat-error *ngIf="courseForm.get('name')?.hasError('required')">
+            Course name is required
+          </mat-error>
+          <mat-error *ngIf="courseForm.get('name')?.hasError('minlength')">
+            Course name must be at least 3 characters
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="4" placeholder="Enter course description"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          <mat-error *ngIf="courseForm.get('description')?.hasError('required')">
+            Description is required
+          </mat-error>
+          <mat-error *ngIf="courseForm.get('description')?.hasError('minlength')">
+            Description must be at least 10 characters
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Board -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Board</mat-label>
+          <mat-select formControlName="board" placeholder="Select board">
+            <mat-option *ngFor="let board of boardOptions" [value]="board">
+              {{ board }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>account_balance</mat-icon>
+          <mat-error *ngIf="courseForm.get('board')?.hasError('required')">
+            Board is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Medium -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Medium</mat-label>
+          <mat-select formControlName="medium" multiple placeholder="Select medium(s)">
+            <mat-option *ngFor="let medium of mediumOptions" [value]="medium">
+              {{ medium }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>language</mat-icon>
+          <mat-error *ngIf="courseForm.get('medium')?.hasError('required')">
+            At least one medium is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Grade -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Grade</mat-label>
+          <mat-select formControlName="grade" multiple placeholder="Select grade(s)">
+            <mat-option *ngFor="let grade of gradeOptions" [value]="grade">
+              Grade {{ grade }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>school</mat-icon>
+          <mat-error *ngIf="courseForm.get('grade')?.hasError('required')">
+            At least one grade is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Subject -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Subject</mat-label>
+          <mat-select formControlName="subject" multiple placeholder="Select subject(s)">
+            <mat-option *ngFor="let subject of subjectOptions" [value]="subject">
+              {{ subject }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>class</mat-icon>
+          <mat-error *ngIf="courseForm.get('subject')?.hasError('required')">
+            At least one subject is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Units Selection -->
+        <div class="units-section">
+          <div class="units-header actions-right">
+            <h3>Units</h3>
+            <button mat-raised-button type="button" class="app-btn app-btn--primary" (click)="openAddUnitDialog()">
+              <mat-icon>add</mat-icon>
+              Add New Unit
+            </button>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width" *ngIf="availableUnits && availableUnits.length > 0">
+            <mat-label>Select Units</mat-label>
+            <mat-select [(value)]="selectedUnits" multiple placeholder="Select units for this course">
+              <mat-option *ngFor="let unit of availableUnits" [value]="unit.id">
+                {{ unit.title }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>list</mat-icon>
+          </mat-form-field>
+
+          <div *ngIf="!availableUnits || availableUnits.length === 0" class="no-units-message">
+            <mat-icon>info</mat-icon>
+            <p>No units available. Click "Add New Unit" to create one.</p>
+          </div>
+
+          <!-- Display selected units as a vertical list with delete actions -->
+          <div *ngIf="selectedUnits && selectedUnits.length > 0" class="selected-units">
+            <h4>Selected Units</h4>
+            <div class="selected-units-list">
+              <div class="unit-item" *ngFor="let unitId of selectedUnits">
+                <div class="unit-title">{{ getUnitTitle(unitId) }}</div>
+                <button type="button" mat-button class="app-btn app-btn--warn delete-unit-btn" (click)="onDeleteUnitClick($event, unitId)">
+                  <mat-icon>delete</mat-icon>
+                  Delete Unit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="actions-right">
+        <button mat-button type="button" class="app-btn app-btn--ghost" (click)="onCancel()">
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+        <button mat-raised-button class="app-btn app-btn--primary" type="submit" [disabled]="!courseForm.valid || isSubmitting">
+          <mat-icon>{{ isEditMode ? 'update' : 'add' }}</mat-icon>
+          {{ isSubmitting ? 'Saving...' : submitButtonText }}
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+</div>
+

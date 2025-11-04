@@ -1,0 +1,38 @@
+<div class="form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Create New Unit</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="unitForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Unit Title</mat-label>
+          <input matInput formControlName="title" placeholder="Enter unit title">
+          <mat-error *ngIf="unitForm.get('title')?.invalid && unitForm.get('title')?.touched">
+            {{ getErrorMessage('title') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Content</mat-label>
+          <textarea matInput formControlName="content" rows="6" placeholder="Enter unit content"></textarea>
+          <mat-error *ngIf="unitForm.get('content')?.invalid && unitForm.get('content')?.touched">
+            {{ getErrorMessage('content') }}
+          </mat-error>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions class="actions-right">
+      <button mat-raised-button class="app-btn app-btn--primary"
+              [disabled]="unitForm.invalid || isSubmitting"
+              (click)="onSubmit()">
+        {{ isSubmitting ? 'Creating...' : 'Create Unit' }}
+      </button>
+      <button mat-button class="app-btn app-btn--ghost" (click)="onBackToCourses()">
+        Back to Courses
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

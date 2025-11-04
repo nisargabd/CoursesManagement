@@ -1,0 +1,223 @@
+<div class="main-container">
+  <!-- Left Sidebar - Fixed -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <mat-icon class="logo-icon">school</mat-icon>
+      <h2>Course Hub</h2>
+    </div>
+    
+    <div class="sidebar-content">
+      <div class="filter-section">
+        <h3>Filters</h3>
+
+        <!-- Loading state for filters -->
+        <div *ngIf="filterOptionsLoading" class="filter-loading">
+          <mat-spinner diameter="30"></mat-spinner>
+          <p>Loading filter options...</p>
+        </div>
+
+        <!-- Filter fields -->
+        <!-- <div *ngIf="!filterOptionsLoading">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Board</mat-label>
+            <mat-select [(ngModel)]="filters.board" (ngModelChange)="onFilterChange()">
+              <mat-option value="">All Boards</mat-option>
+              <mat-option *ngFor="let board of boardOptions" [value]="board">{{ board }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Medium</mat-label>
+            <mat-select [(ngModel)]="filters.medium" (ngModelChange)="onFilterChange()">
+              <mat-option value="">All Mediums</mat-option>
+              <mat-option *ngFor="let medium of mediumOptions" [value]="medium">{{ medium }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Grade</mat-label>
+            <mat-select [(ngModel)]="filters.grade" (ngModelChange)="onFilterChange()">
+              <mat-option value="">All Grades</mat-option>
+              <mat-option *ngFor="let grade of gradeOptions" [value]="grade">{{ grade }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Subject</mat-label>
+            <mat-select [(ngModel)]="filters.subject" (ngModelChange)="onFilterChange()">
+              <mat-option value="">All Subjects</mat-option>
+              <mat-option *ngFor="let subject of subjectOptions" [value]="subject">{{ subject }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div> -->
+        <mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Board</mat-label>
+  <mat-select [(ngModel)]="filters.board" (selectionChange)="onBoardChange(); onFilterChange()">
+    <mat-option value="">All Boards</mat-option>
+    <mat-option *ngFor="let board of boardOptions" [value]="board">{{ board }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Medium</mat-label>
+  <mat-select [(ngModel)]="filters.medium" (selectionChange)="onMediumChange(); onFilterChange()">
+    <mat-option value="">All Mediums</mat-option>
+    <mat-option *ngFor="let medium of mediumOptions" [value]="medium">{{ medium }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Grade</mat-label>
+  <mat-select [(ngModel)]="filters.grade" (selectionChange)="onGradeChange(); onFilterChange()">
+    <mat-option value="">All Grades</mat-option>
+    <mat-option *ngFor="let grade of gradeOptions" [value]="grade">{{ grade }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Subject</mat-label>
+  <mat-select [(ngModel)]="filters.subject" (selectionChange)="onFilterChange()">
+    <mat-option value="">All Subjects</mat-option>
+    <mat-option *ngFor="let subject of subjectOptions" [value]="subject">{{ subject }}</mat-option>
+  </mat-select>
+</mat-form-field>
+
+
+        <!-- Clear All Button at Bottom -->
+        <div class="clear-button-container">
+          <button mat-stroked-button class="clear-button" (click)="clearFilters()">
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Top Bar with Search and Add Course -->
+    <div class="top-bar">
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <input matInput [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search courses by name or description...">
+        </mat-form-field>
+      </div>
+      
+      <div class="add-course-container">
+        <button mat-raised-button color="primary" class="add-course-btn" (click)="addNewCourse()">
+          <mat-icon>add_circle</mat-icon>
+          Add New Course
+        </button>
+      </div>
+    </div>
+    
+
+    <!-- Course Cards Grid -->
+    <div class="courses-section">
+      <div class="section-header">
+        <h1>All Courses</h1>
+        <span class="course-count" *ngIf="filteredCourses.length > 0">
+          {{ searchMode ? filteredCourses.length : totalElements }} course<span *ngIf="(searchMode ? filteredCourses.length : totalElements) !== 1">s</span> found
+        </span>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading courses...</p>
+      </div>
+
+      <div class="course-grid" *ngIf="!isLoading && filteredCourses.length > 0">
+        <mat-card *ngFor="let course of getDisplayedCourses()" class="course-card" (click)="navigateToCourse(course.id!)">
+          <div class="card-image" [style.background]="getRandomCourseImage(course)">
+            <div class="course-badge">{{ course.board }}</div>
+          </div>
+          
+          <mat-card-content>
+            <h3 class="course-title">{{ course.name }}</h3>
+            <p class="course-description">{{ course.description }}</p>
+            
+            <div class="course-meta">
+              <div class="meta-item">
+                <mat-icon>language</mat-icon>
+                <span>{{ course.medium | joinList }}</span>
+              </div>
+              <div class="meta-item">
+                <mat-icon>school</mat-icon>
+                <span>Grade {{ course.grade | joinList }}</span>
+              </div>
+              <div class="meta-item">
+                <mat-icon>book</mat-icon>
+                <span>{{ course.subject | joinList }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+          
+          <mat-card-actions class="card-actions actions-right">
+            <button mat-button class="app-btn app-btn--primary" (click)="editCourse(course.id!); $event.stopPropagation()">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+            <button mat-button class="app-btn app-btn--warn" (click)="deleteCourse(course.id!); $event.stopPropagation()">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div *ngIf="!isLoading && ((searchMode ? filteredCourses.length : totalElements) > pageSize)" class="pagination-container">
+        <div class="pagination-left">
+          <span class="rows-per-page-label">Rows per page:</span>
+          <mat-select [(value)]="pageSize" (selectionChange)="onPageSizeChange($event.value)" class="page-size-select">
+            <mat-option *ngFor="let size of [5, 10, 25, 50]" [value]="size">{{ size }}</mat-option>
+          </mat-select>
+        </div>
+        <div class="pagination-center">
+          <span class="pagination-info">{{ getPaginationInfo() }}</span>
+          <div class="pagination-numbers">
+            <button mat-icon-button (click)="goToFirstPage()" [disabled]="currentPage === 0" class="nav-button">
+              <mat-icon>first_page</mat-icon>
+            </button>
+            <button mat-icon-button (click)="goToPreviousPage()" [disabled]="currentPage === 0" class="nav-button">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            
+            <!-- Page Numbers -->
+            <div class="page-numbers">
+              <button 
+                *ngFor="let page of getPageNumbers()" 
+                mat-button 
+                [class.active]="page === currentPage"
+                [class.disabled]="page === '...'"
+                (click)="goToPage(page)"
+                [disabled]="page === '...'"
+                class="page-number">
+                {{ page }}
+              </button>
+            </div>
+            
+            <button mat-icon-button (click)="goToNextPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+            <button mat-icon-button (click)="goToLastPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
+              <mat-icon>last_page</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && filteredCourses.length === 0" class="no-results">
+        <mat-icon>search_off</mat-icon>
+        <h3>No courses found</h3>
+        <p>Try adjusting your search criteria or filters.</p>
+        <button mat-raised-button color="primary" (click)="clearFilters()">
+          <mat-icon>refresh</mat-icon>
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

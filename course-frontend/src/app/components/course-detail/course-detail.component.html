@@ -1,0 +1,139 @@
+<div class="course-detail-container">
+  <!-- Back Button -->
+  <div class="back-button actions-right">
+    <button mat-button class="app-btn app-btn--ghost" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Courses
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-icon>hourglass_empty</mat-icon>
+    <p>Loading course details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon>error</mat-icon>
+    <h3>Error Loading Course</h3>
+    <p>There was an error loading the course details. Please try again.</p>
+    <button mat-raised-button class="app-btn app-btn--primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Courses
+    </button>
+  </div>
+
+  <!-- Course Details -->
+  <div *ngIf="!loading && !error && course" class="course-content">
+    <mat-card class="course-detail-card">
+      <mat-card-header>
+        <mat-card-title>{{ course.name }}</mat-card-title>
+        <mat-card-subtitle>{{ course.board }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <!-- Description -->
+        <div class="course-description">
+          <h3>Description</h3>
+          <p>{{ course.description }}</p>
+        </div>
+        
+        <!-- Course Details -->
+        <div class="course-details">
+          <div class="detail-section">
+            <h3>Course Details</h3>
+            
+            <!-- Medium -->
+            <div class="detail-item">
+              <mat-icon>language</mat-icon>
+              <div class="detail-content">
+                <strong>Medium:</strong>
+                <mat-chip-set>
+                  <mat-chip *ngFor="let medium of course.medium">{{ medium }}</mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+            
+            <!-- Grade -->
+            <div class="detail-item">
+              <mat-icon>school</mat-icon>
+              <div class="detail-content">
+                <strong>Grade:</strong>
+                <mat-chip-set>
+                  <mat-chip *ngFor="let grade of course.grade">{{ grade }}</mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+            
+            <!-- Subject -->
+            <div class="detail-item">
+              <mat-icon>book</mat-icon>
+              <div class="detail-content">
+                <strong>Subject:</strong>
+                <mat-chip-set>
+                  <mat-chip *ngFor="let subject of course.subject">{{ subject }}</mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+          </div>
+
+          <!-- Units Section -->
+          <div class="units-section" *ngIf="course.units && course.units.length > 0">
+            <h3>
+              <mat-icon>list</mat-icon>
+              Course Units ({{ course.units.length }})
+            </h3>
+            <div class="units-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let unit of course.units; let i = index">
+                    <td class="unit-title">
+                      <mat-icon>book</mat-icon>
+                      {{ unit.title }}
+                    </td>
+                    <td class="unit-content">{{ unit.content }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- No Units Message -->
+          <div class="units-section no-units" *ngIf="!course.units || course.units.length === 0">
+            <mat-icon>info_outline</mat-icon>
+            <p>No units have been added to this course yet.</p>
+          </div>
+        </div>
+      </mat-card-content>
+      
+      <mat-card-actions class="actions-right">
+        <button mat-raised-button class="app-btn app-btn--primary" (click)="editCourse()">
+          <mat-icon>edit</mat-icon>
+          Edit Course
+        </button>
+        <button mat-raised-button class="app-btn app-btn--warn" (click)="deleteCourse()">
+          <mat-icon>delete</mat-icon>
+          Delete Course
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- No Course Found -->
+  <div *ngIf="!loading && !error && !course" class="no-course-container">
+    <mat-icon>search_off</mat-icon>
+    <h3>Course Not Found</h3>
+    <p>The course you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button class="app-btn app-btn--primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Courses
+    </button>
+  </div>
+</div>

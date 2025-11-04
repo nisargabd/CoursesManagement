@@ -1,0 +1,348 @@
+/* ------------------------------
+   COURSE FORM - PROFESSIONAL DESIGN
+   Clean, Responsive, and Modern
+---------------------------------*/
+
+.course-form-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  background: linear-gradient(180deg, #f8faff 0%, #eef2f6 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+/* ---------- HEADER ---------- */
+.form-header {
+  display: flex;
+  justify-content: center; /* center title */
+  align-items: center;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+  padding: 20px 28px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e3e7ee;
+
+  h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    color: #1976d2; /* standard primary */
+    letter-spacing: -0.3px;
+    text-align: center;
+  }
+
+  .close-button {
+    color: #6b7280;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+
+    &:hover {
+      background: #f3f4f6;
+      color: #111827;
+      transform: rotate(90deg);
+    }
+  }
+}
+
+/* ---------- CARD & FORM ---------- */
+.course-form-card {
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e5e8ee;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.08);
+  }
+
+  mat-card-content {
+    padding: 36px;
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 28px;
+
+  ::ng-deep {
+    .mat-mdc-form-field {
+      background: #ffffff;
+      border-radius: 10px;
+      transition: box-shadow 0.2s ease, border 0.2s ease;
+      border: 1px solid #e3e7ee;
+      --mdc-outlined-text-field-outline-color: #d6dde7;
+      --mdc-outlined-text-field-hover-outline-color: #c4cfdd;
+      --mdc-outlined-text-field-focus-outline-color: #1976d2;
+      padding: 6px 12px;
+
+      &:focus-within {
+        border-color: #1976d2;
+        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+      }
+    }
+
+    .mat-mdc-form-field-label {
+      color: #5f6368 !important;
+      font-size: 14px !important;
+      font-weight: 500 !important;
+    }
+
+    input,
+    textarea {
+      font-size: 15px;
+      color: #202124;
+      font-weight: 500;
+      padding: 8px 4px;
+
+      &::placeholder {
+        color: #9aa0a6;
+        font-weight: 400;
+      }
+    }
+
+    .mat-mdc-select {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .mat-mdc-option {
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      margin: 4px 6px;
+
+      &:hover {
+        background: #f2f7ff;
+        color: #1976d2;
+      }
+
+      &.mdc-list-item--selected {
+        background: #e3f2fd !important;
+        font-weight: 600;
+        color: #1976d2;
+      }
+    }
+
+    mat-icon.mat-mdc-form-field-icon {
+      color: #1976d2;
+    }
+  }
+}
+
+/* ---------- UNITS SECTION ---------- */
+.units-section {
+  margin-top: 40px;
+  background: linear-gradient(135deg, #f5f9ff 0%, #f9f5ff 100%);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e3e7ee;
+  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.08);
+
+  .units-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h3 {
+      margin: 0;
+      color: #1976d2;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      &::before {
+        content: '📘';
+        font-size: 20px;
+      }
+    }
+
+    button {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 6px 20px;
+      letter-spacing: 0.3px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #1976d2;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
+      }
+    }
+  }
+
+  .no-units-message {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+    font-weight: 500;
+
+    mat-icon {
+      color: #ffa726;
+    }
+  }
+
+  .selected-units {
+    margin-top: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px #e3e7ee;
+
+    h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #5f6368;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .selected-units-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    /* Ensure each unit row is a single line with action on the far right */
+    .unit-item {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      width: 100%;
+      gap: 12px;
+    }
+
+    .unit-title {
+      flex: 1 1 auto;
+      margin-right: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .delete-unit-btn {
+      margin-left: auto;
+    }
+  }
+}
+
+/* ---------- ACTION BUTTONS ---------- */
+mat-card-actions {
+  padding: 20px 36px;
+  background: #fafbfc;
+  border-top: 1px solid #e3e7ee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+
+  button {
+    height: 46px;
+    padding: 0 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+
+    &[color='primary'] {
+      background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+      color: white;
+      box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+      }
+    }
+
+    &:not([color='primary']) {
+      background: #f4f5f7;
+      color: #374151;
+
+      &:hover {
+        background: #e5e7eb;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* ---------- LOADING STATE ---------- */
+.loading-container {
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  padding: 80px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+  mat-icon {
+    font-size: 60px;
+    color: #1976d2;
+    margin-bottom: 16px;
+    animation: spin 1.8s linear infinite;
+  }
+
+  p {
+    font-size: 16px;
+    color: #5f6368;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+  .course-form-container {
+    padding: 20px;
+  }
+
+  .form-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .course-form-card mat-card-content {
+    padding: 20px;
+  }
+
+  .units-section {
+    padding: 16px;
+  }
+
+  mat-card-actions {
+    flex-direction: column;
+    button {
+      width: 100%;
+    }
+  }
+}

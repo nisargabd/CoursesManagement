@@ -1,0 +1,21 @@
+# Node modules (Angular)
+course-frontend/node_modules/
+course-frontend/dist/
+
+# Java (Spring Boot)
+course-backend/target/
+
+# Environment files
+*.env
+.env
+
+# OS files
+.DS_Store
+
+# IntelliJ / VSCode
+.idea/
+*.iml
+.vscode/
+
+# Logs
+*.log
