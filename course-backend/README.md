@@ -1,85 +1,48 @@
-# Course Frontend
+Course Management Backend – README
+✅ Overview
 
-A modern Angular frontend application for managing courses and units, built with Angular Material and TypeScript.
+This is a Spring Boot backend for managing courses, boards, mediums, classes, and subjects.
+It exposes REST APIs consumed by your Angular frontend and stores data in PostgreSQL.
+The project can run normally or fully containerized using Docker Compose.
 
-## Features
+✅ Tech Stack
 
-- **Course Management**: View, create, and manage courses with filtering and search capabilities
-- **Unit Management**: Create and manage course units
-- **Responsive Design**: Built with Angular Material for a modern, responsive UI
-- **Advanced Filtering**: Filter courses by board, medium, grade, and subject
-- **Search Functionality**: Search courses by name and description
+Java 17
 
-## Tech Stack
+Spring Boot 3.x
 
-- Angular 18
-- Angular Material
-- TypeScript
-- SCSS
-- RxJS
+Spring Data JPA (Hibernate)
 
-## Getting Started
+PostgreSQL
 
-### Prerequisites
+Lombok
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Angular CLI
+Docker & Docker Compose
 
-### Installation
+Maven
 
-1. Install dependencies:
-```bash
-npm install
-```
+✅ Architecture Flow
+Angular Frontend  →  Spring Boot Backend  →  PostgreSQL Database
 
-2. Start the development server:
-```bash
-npm start
-```
+How requests flow:
 
-3. Open your browser and navigate to `http://localhost:4200`
+Angular calls REST API
 
-### Backend Integration
+Controller receives request
 
-This frontend is designed to work with a Spring Boot backend. Make sure your backend is running on `http://localhost:8089` with the following endpoints:
+Service layer handles logic
 
-- `GET /api/courses` - Get all courses
-- `POST /api/courses` - Create a new course
-- `POST /api/units` - Create a new unit
+Repository (JPA) interacts with DB
 
-## Project Structure
+Response returned as JSON
 
-```
-src/app/
-├── components/
-│   ├── course-list/     # Course listing with filters
-│   ├── course-form/     # Course creation form
-│   └── unit-form/       # Unit creation form
-├── services/
-│   ├── course.service.ts
-│   └── unit.service.ts
-├── models/
-│   ├── course.model.ts
-│   └── unit.model.ts
-├── pipes/
-│   └── join-list.pipe.ts
-└── app-routing.module.ts
-```
+✅ Key Backend Concepts
+✔ Entity Relationships
 
-## Development
+@OneToMany, @ManyToOne
 
-### Available Scripts
+@JsonManagedReference, @JsonBackReference → prevents infinite recursion
 
-- `npm start` - Start development server
-- `npm run build` - Build for production
-- `npm test` - Run unit tests
+@CreationTimestamp, @UpdateTimestamp → auto timestamps
 
-### Code Style
-
-This project follows Angular best practices:
-- Standalone components
-- Reactive forms
-- TypeScript strict mode
-- SCSS for styling
-- Angular Material for UI components
+@Convert(StringListConverter.class) → store List<String> fields
