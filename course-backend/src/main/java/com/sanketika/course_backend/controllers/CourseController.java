@@ -27,7 +27,7 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-    // ✅ Get all courses
+    //  Get all courses
     @GetMapping("/get")
     public ResponseEntity<Page<CourseDto>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
@@ -51,7 +51,7 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Create course
+    //  Create course
     @PostMapping("/add")
     public ResponseEntity<ApiEnvelope<CourseDto>> createCourse(@Valid @RequestBody CourseDto dto) {
         logger.info("Creating new course: {}", dto.getName());
@@ -65,7 +65,7 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Update course
+    // Update course
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseDto dto) {
         logger.info("Updating course with ID: {}", id);
@@ -79,7 +79,7 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Delete course
+    //  Delete course
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiEnvelope<Void>> deleteCourse(@PathVariable UUID id) {
         logger.warn("Deleting course with ID: {}", id);
