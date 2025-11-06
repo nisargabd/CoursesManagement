@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseUrl: 'http://backend:9099/api'
+  baseUrl: 'http://course-backend:9099/api'
 };

@@ -1,4 +1,3 @@
-# version: '3.8'
 
 services:
   db:
@@ -12,29 +11,38 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - course
     restart: unless-stopped
 
   backend:
-    build: ./course-backend
+    image: course-backend
     container_name: course_backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/course_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://course_db:5432/course_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
     ports:
-      - "8089:8089"
+      - "9099:9099"
     depends_on:
       - db
+    networks:
+      - course
     restart: unless-stopped
 
   frontend:
-    build: ./course-frontend
+    image: course-frontend
     container_name: course_frontend
     ports:
       - "4800:4800"
     depends_on:
       - backend
+    networks:
+      - course
     restart: unless-stopped
 
 volumes:
   db_data:
+
+networks:
+  course:
