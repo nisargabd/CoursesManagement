@@ -34,7 +34,7 @@ services:
     image: course-frontend
     container_name: course_frontend
     ports:
-      - "4800:4800"
+      - "7900:4800"
     depends_on:
       - backend
     networks:
