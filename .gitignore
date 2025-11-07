@@ -19,3 +19,5 @@ course-backend/target/
 
 # Logs
 *.log
+
+docker-learning

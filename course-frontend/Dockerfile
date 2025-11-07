@@ -11,5 +11,5 @@ RUN npm run build -- --configuration production
 # ---- Run Stage ----
 FROM nginx:alpine
 COPY --from=build /app/dist/course-frontend /usr/share/nginx/html
-EXPOSE 4800
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
