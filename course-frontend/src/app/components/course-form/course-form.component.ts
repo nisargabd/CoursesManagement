@@ -67,36 +67,133 @@ export class CourseFormComponent implements OnInit {
     private dialog: MatDialog
   ) {
     this.courseForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
+      name: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(30)]],
+      description: ['', [Validators.required, Validators.minLength(10),Validators.maxLength(100)]],
       board: ['', Validators.required],
-      medium: [[], [Validators.required, Validators.minLength(1)]],
-      grade: [[], [Validators.required, Validators.minLength(1)]],
-      subject: [[], [Validators.required, Validators.minLength(1)]],
+      medium: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(3)]],
+      grade: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(5)]],
+      subject: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(3)]],
       units: [[]]
     });
   }
+  private forceRevalidateForm(): void {
+  Object.keys(this.courseForm.controls).forEach(key => {
+    const control = this.courseForm.get(key);
 
-  ngOnInit(): void {
-    console.log('CourseFormComponent ngOnInit called');
-    
-    // Load filter options first
-    this.loadFilterOptions();
-    
-    // Get course ID from route
-    this.courseId = this.route.snapshot.paramMap.get('id');
-    this.isEditMode = !!this.courseId;
-    
-    console.log('Course ID:', this.courseId);
-    console.log('Is Edit Mode:', this.isEditMode);
-    
-    if (this.isEditMode && this.courseId) {
-      this.loadCourseForEdit();
-    } else {
-      this.loading = false;
-      this.loadAvailableUnits();
+    if (control) {
+      control.setErrors(null);   // ✅ clear old errors
+      control.updateValueAndValidity({ onlySelf: true, emitEvent: false }); // ✅ recalc errors
     }
+  });
+
+  this.courseForm.updateValueAndValidity({ emitEvent: false });
+}
+
+
+  // ngOnInit(): void {
+  //   console.log('CourseFormComponent ngOnInit called');
+    
+  //   // Load filter options first
+  //   this.loadFilterOptions();
+    
+  //   // Get course ID from route
+  //   this.courseId = this.route.snapshot.paramMap.get('id');
+  //   this.isEditMode = !!this.courseId;
+    
+  //   console.log('Course ID:', this.courseId);
+  //   console.log('Is Edit Mode:', this.isEditMode);
+    
+  //   if (this.isEditMode && this.courseId) {
+  //     this.loadCourseForEdit();
+  //   } else {
+  //     this.loading = false;
+  //     this.loadAvailableUnits();
+  //   }
+  // }
+ngOnInit(): void {  
+  this.loadFilterOptions();
+
+  // Determine mode first
+  this.courseId = this.route.snapshot.paramMap.get('id');
+  this.isEditMode = !!this.courseId;
+
+  // ✅ Apply stepwise disabling ONLY for Add Course
+  if (!this.isEditMode) {
+    this.setupStepwiseFormValidation();
   }
+
+  if (this.isEditMode && this.courseId) {
+    this.loadCourseForEdit();
+  } else {
+    this.loading = false;
+    this.loadAvailableUnits();
+  }
+}
+
+setupStepwiseFormValidation(): void {
+
+  // Step 1 → Enable Description only if Name is valid
+  this.courseForm.get('name')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('description')?.enable();
+    } else {
+      this.courseForm.get('description')?.disable();
+    }
+  });
+
+  // Step 2 → Enable Board only if Description valid
+  this.courseForm.get('description')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('board')?.enable();
+    } else {
+      this.courseForm.get('board')?.disable();
+    }
+  });
+
+  // Step 3 → Medium enabled when Board valid
+  this.courseForm.get('board')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('medium')?.enable();
+    } else {
+      this.courseForm.get('medium')?.disable();
+    }
+  });
+
+  // Step 4 → Grade enabled when Medium valid
+  this.courseForm.get('medium')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('grade')?.enable();
+    } else {
+      this.courseForm.get('grade')?.disable();
+    }
+  });
+
+  // Step 5 → Subject enabled when Grade valid
+  this.courseForm.get('grade')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('subject')?.enable();
+    } else {
+      this.courseForm.get('subject')?.disable();
+    }
+  });
+
+  // Step 6 → Units enabled when Subject valid
+  this.courseForm.get('subject')?.statusChanges.subscribe(status => {
+    if (status === 'VALID') {
+      this.courseForm.get('units')?.enable();
+    } else {
+      this.courseForm.get('units')?.disable();
+    }
+  });
+
+  // disable all except first (name)
+  this.courseForm.get('description')?.disable();
+  this.courseForm.get('board')?.disable();
+  this.courseForm.get('medium')?.disable();
+  this.courseForm.get('grade')?.disable();
+  this.courseForm.get('subject')?.disable();
+  this.courseForm.get('units')?.disable();
+}
 
   loadFilterOptions(): void {
     this.filterOptionsLoading = true;
@@ -131,7 +228,7 @@ export class CourseFormComponent implements OnInit {
 
   loadCourseForEdit(): void {
     if (!this.courseId) {
-      console.log('No course ID provided');
+      // console.log('No course ID provided');
       this.loading = false;
       return;
     }
@@ -163,6 +260,18 @@ export class CourseFormComponent implements OnInit {
           subject: course.subject || [],
           units: course.units || []
         });
+        // ✅ Edit mode: ensure ALL controls are enabled
+      Object.keys(this.courseForm.controls).forEach(key => {
+        this.courseForm.get(key)?.enable({ emitEvent: false });
+      });
+
+      this.forceRevalidateForm();
+
+      // ✅ Force revalidation (important)
+      Object.keys(this.courseForm.controls).forEach(key => {
+        this.courseForm.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      });
+      this.courseForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
         
         // Set selected units
         this.selectedUnits = course.units?.map(unit => unit.id).filter(id => id !== undefined) as string[] || [];

@@ -1,8 +1,15 @@
-# Development Dockerfile for Angular
-FROM node:20-alpine
+# ---- Build Stage ----
+FROM node:20-alpine AS build
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
 COPY . .
+RUN npm run build -- --configuration production
+
+# ---- Run Stage ----
+FROM nginx:alpine
+COPY --from=build /app/dist/course-frontend /usr/share/nginx/html
 EXPOSE 4800
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
