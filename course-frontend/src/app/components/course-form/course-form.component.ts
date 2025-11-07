@@ -474,41 +474,29 @@ setupStepwiseFormValidation(): void {
     console.log('Selected units changed:', this.selectedUnits);
   }
 
-  openAddUnitDialog(): void {
-    if (!this.courseId) {
-      this.snackBar.open('Save the course first, then add units to it.', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'right',
-        verticalPosition: 'top'
-      });
-      return;
+ openAddUnitDialog(): void {
+  const dialogRef = this.dialog.open(AddUnitDialogComponent, {
+    width: '500px',
+    data: { courseId: this.courseId } // null is OK for add mode
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (!result) return;
+
+    const map = new Map<string, Unit>();
+    [...this.availableUnits, result as Unit].forEach(u => {
+      if (u && u.id) map.set(u.id, u);
+    });
+
+    this.availableUnits = Array.from(map.values());
+
+    const newId = String(result.id);
+    if (!this.selectedUnits.includes(newId)) {
+      this.selectedUnits = [...this.selectedUnits, newId];
     }
+  });
+}
 
-    const dialogRef = this.dialog.open(AddUnitDialogComponent, {
-      width: '500px',
-      data: { courseId: this.courseId }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Unit dialog closed with result:', result);
-        // If dialog returned the created unit, merge it immediately for better UX
-        if (result && result.id) {
-          const map = new Map<string, Unit>();
-          [...this.availableUnits, result as Unit].forEach(u => { if (u && u.id) map.set(u.id, u); });
-          this.availableUnits = Array.from(map.values());
-          // Auto-select the newly created unit
-          const newId = String(result.id);
-          if (!this.selectedUnits.includes(newId)) {
-            this.selectedUnits = [...this.selectedUnits, newId];
-          }
-        } else {
-          // Fallback: reload from API
-          this.loadAvailableUnits();
-        }
-      }
-    });
-  }
 
   // Open confirm dialog and remove unit on confirm
   confirmRemoveUnit(unitId: string): void {

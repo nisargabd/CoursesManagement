@@ -76,32 +76,37 @@ export class AddUnitDialogComponent {
   }
 
   onSubmit(): void {
-    if (this.unitForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
-      const unitData: Unit = {
-        ...this.unitForm.value,
-        courseId: this.data.courseId
-      };
+  if (this.unitForm.valid && !this.isSubmitting) {
+    this.isSubmitting = true;
+    const unitData: Unit = {
+      title: this.unitForm.value.title,
+      content: this.unitForm.value.content,
+      courseId: this.data.courseId
+    };
 
-      this.unitService.createUnit(unitData).subscribe({
-        next: (createdUnit) => {
-          this.snackBar.open('Unit created successfully', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
-          this.dialogRef.close(createdUnit);
-        },
-        error: (error) => {
-          console.error('Error creating unit:', error);
-          this.snackBar.open('Error creating unit', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
-          this.isSubmitting = false;
-        }
-      });
-    }
+    console.log('Creating unit:', unitData);
+
+    this.unitService.createUnit(unitData).subscribe({
+      next: (createdUnit) => {
+        console.log('Unit created successfully:', createdUnit);
+        this.snackBar.open('Unit created successfully', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+        this.dialogRef.close(createdUnit);
+      },
+      error: (error) => {
+        console.error('Error creating unit:', error);
+        this.snackBar.open('Error creating unit. Please try again.', 'Close', {
+          duration: 5000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+        this.isSubmitting = false;
+      }
+    });
   }
+}
+
 }
