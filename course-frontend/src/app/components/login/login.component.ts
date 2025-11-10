@@ -45,10 +45,23 @@ export class LoginComponent {
   onSubmit() {
     if (this.loginForm.invalid) return;
 
-    this.auth.login(this.loginForm.value).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: () => alert('Login failed')
-    });
+  this.auth.login(this.loginForm.value).subscribe({
+  next: (res) => {
+    // ✅ store login data
+    localStorage.setItem('token', res.token);
+    localStorage.setItem('role', res.role);
+    localStorage.setItem('username', res.username);
+
+    // ✅ redirect based on role
+    if (res.role === 'ADMIN') {
+      this.router.navigate(['/admin-dashboard']);
+    } else {
+      this.router.navigate(['/user-dashboard']);
+    }
+  },
+  error: () => alert('Login failed')
+});
+
   }
 }
   

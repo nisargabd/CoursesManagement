@@ -18,6 +18,7 @@ import { FilterOptionsService, FilterOptions } from '../../services/filter-optio
 import { Course, CourseFilter } from '../../models/course.model';
 import { JoinListPipe } from '../../pipes/join-list.pipe';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { RoleService } from '../../services/role.service';
 
 @Component({
   selector: 'app-course-list',
@@ -66,10 +67,12 @@ export class CourseListComponent implements OnInit {
 
   constructor(
     private courseService: CourseService,
+    
     private filterOptionsService: FilterOptionsService,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public roleService: RoleService
   ) {}
 
   ngOnInit(): void {

@@ -112,8 +112,26 @@
           </div>
         </div>
       </mat-card-content>
+     <mat-card-actions 
+  class="card-actions actions-right"
+  *ngIf="roleService.isAdmin()">
+
+  <button mat-button class="app-btn app-btn--primary"
+    (click)="editCourse(); $event.stopPropagation()">
+    <mat-icon>edit</mat-icon>
+    Edit
+  </button>
+
+  <button mat-button class="app-btn app-btn--warn"
+    (click)="deleteCourse(); $event.stopPropagation()">
+    <mat-icon>delete</mat-icon>
+    Delete
+  </button>
+
+</mat-card-actions>
+
       
-      <mat-card-actions class="actions-right">
+      <!-- <mat-card-actions class="actions-right">
         <button mat-raised-button class="app-btn app-btn--primary" (click)="editCourse()">
           <mat-icon>edit</mat-icon>
           Edit Course
@@ -122,7 +140,7 @@
           <mat-icon>delete</mat-icon>
           Delete Course
         </button>
-      </mat-card-actions>
+      </mat-card-actions> -->
     </mat-card>
   </div>
 

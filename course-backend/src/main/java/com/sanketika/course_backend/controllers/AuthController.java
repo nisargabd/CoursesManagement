@@ -17,11 +17,18 @@ public class AuthController {
         this.service = service;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
-        service.register(req);
-        return ResponseEntity.ok("User registered successfully");
-    }
+   @PostMapping("/register")
+public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+    service.register(req);
+
+    return ResponseEntity.ok(
+            java.util.Map.of(
+                    "success", true,
+                    "message", "User registered successfully"
+            )
+    );
+}
+
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {

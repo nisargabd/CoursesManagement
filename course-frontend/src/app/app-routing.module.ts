@@ -9,6 +9,7 @@ import { RegisterComponent } from './components/register/register.component';
 
 import { AuthGuard } from './guards/auth.guard';
 import { LoginComponent } from './components/login/login.component';
+import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
 
@@ -28,6 +29,17 @@ export const routes: Routes = [
       { path: 'unit', component: UnitFormComponent }
     ]
   },
+  {
+  path: 'add-course',
+  component: CourseListComponent,
+  canActivate: [AdminGuard]
+},
+{
+  path: 'edit-course/:id',
+  component: CourseListComponent,
+  canActivate: [AdminGuard]
+},
+
 
   // ✅ DEFAULT ROUTE
   { path: '', redirectTo: 'courses', pathMatch: 'full' },

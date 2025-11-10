@@ -10,6 +10,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { CourseService } from '../../services/course.service';
 import { Course } from '../../models/course.model';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { RoleService } from '../../services/role.service';
 
 @Component({
   selector: 'app-course-detail',
@@ -37,7 +38,8 @@ export class CourseDetailComponent implements OnInit {
     private router: Router,
     private courseService: CourseService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public roleService: RoleService
   ) {}
 
   ngOnInit(): void {
