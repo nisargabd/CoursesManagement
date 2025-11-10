@@ -16,40 +16,6 @@
           <p>Loading filter options...</p>
         </div>
 
-        <!-- Filter fields -->
-        <!-- <div *ngIf="!filterOptionsLoading">
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Board</mat-label>
-            <mat-select [(ngModel)]="filters.board" (ngModelChange)="onFilterChange()">
-              <mat-option value="">All Boards</mat-option>
-              <mat-option *ngFor="let board of boardOptions" [value]="board">{{ board }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Medium</mat-label>
-            <mat-select [(ngModel)]="filters.medium" (ngModelChange)="onFilterChange()">
-              <mat-option value="">All Mediums</mat-option>
-              <mat-option *ngFor="let medium of mediumOptions" [value]="medium">{{ medium }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Grade</mat-label>
-            <mat-select [(ngModel)]="filters.grade" (ngModelChange)="onFilterChange()">
-              <mat-option value="">All Grades</mat-option>
-              <mat-option *ngFor="let grade of gradeOptions" [value]="grade">{{ grade }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="filter-field">
-            <mat-label>Subject</mat-label>
-            <mat-select [(ngModel)]="filters.subject" (ngModelChange)="onFilterChange()">
-              <mat-option value="">All Subjects</mat-option>
-              <mat-option *ngFor="let subject of subjectOptions" [value]="subject">{{ subject }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div> -->
         <mat-form-field appearance="outline" class="filter-field">
   <mat-label>Board</mat-label>
   <mat-select [(ngModel)]="filters.board" (selectionChange)="onBoardChange(); onFilterChange()">
@@ -104,12 +70,22 @@
         </mat-form-field>
       </div>
       
-      <div class="add-course-container">
-        <button mat-raised-button color="primary" class="add-course-btn" (click)="addNewCourse()">
-          <mat-icon>add_circle</mat-icon>
-          Add New Course
-        </button>
-      </div>
+      <div class="actions-container">
+
+  <!-- Add Course Button -->
+  <button mat-raised-button color="primary" class="add-course-btn" (click)="addNewCourse()">
+    <mat-icon>add_circle</mat-icon>
+    Add New Course
+  </button>
+
+  <!-- Logout Button -->
+  <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Logout
+  </button>
+
+</div>
+
     </div>
     
 

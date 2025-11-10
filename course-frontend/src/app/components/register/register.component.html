@@ -1,0 +1,104 @@
+<div class="register-container">
+
+  <mat-card class="register-card">
+    <h1 class="title">Create Your Account ✨</h1>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <!-- Username -->
+      <mat-form-field appearance="outline" class="full compact">
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="username">
+        <mat-icon matSuffix class="icon user-icon">person</mat-icon>
+
+        <mat-error *ngIf="registerForm.controls.username.touched && registerForm.controls.username.invalid">
+          Minimum 3 characters required.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline" class="full compact">
+        <mat-label>Email</mat-label>
+        <input matInput formControlName="email">
+        <mat-icon matSuffix class="icon email-icon">mail</mat-icon>
+
+        <mat-error *ngIf="registerForm.controls.email.invalid && registerForm.controls.email.touched">
+          Invalid email format.
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Phone Row -->
+      <div class="phone-row">
+
+        <mat-form-field appearance="outline" class="code-field compact">
+  <mat-label>Code</mat-label>
+  <mat-select formControlName="countryCode">
+
+    <mat-option value="+91">🇮🇳 India (+91)</mat-option>
+    <mat-option value="+1">🇺🇸 USA (+1)</mat-option>
+    <mat-option value="+44">🇬🇧 UK (+44)</mat-option>
+    <mat-option value="+971">🇦🇪 UAE (+971)</mat-option>
+    <mat-option value="+61">🇦🇺 Australia (+61)</mat-option>
+    <mat-option value="+81">🇯🇵 Japan (+81)</mat-option>
+    <mat-option value="+49">🇩🇪 Germany (+49)</mat-option>
+    <mat-option value="+33">🇫🇷 France (+33)</mat-option>
+
+  </mat-select>
+</mat-form-field>
+  
+
+        <mat-form-field appearance="outline" class="phone-field compact">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone">
+          <mat-icon matSuffix class="icon phone-icon">phone</mat-icon>
+
+          <mat-error *ngIf="registerForm.controls.phone.touched && registerForm.controls.phone.invalid">
+            Phone must be 7–12 digits.
+          </mat-error>
+        </mat-form-field>
+
+      </div>
+
+      <!-- Password -->
+      <mat-form-field appearance="outline" class="full compact">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password">
+        <mat-icon matSuffix class="icon pass-icon">vpn_key</mat-icon>
+
+        <mat-error *ngIf="registerForm.controls.password.touched && registerForm.controls.password.invalid">
+          Password must include:
+          <br>• Uppercase
+          <br>• Lowercase
+          <br>• Number
+          <br>• Special character
+          <br>• Minimum 8 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Role -->
+      <mat-form-field appearance="outline" class="full compact">
+        <mat-label>Role</mat-label>
+        <mat-select formControlName="role">
+          <mat-option value="ADMIN">Admin</mat-option>
+          <mat-option value="USER">User</mat-option>
+        </mat-select>
+
+        <mat-error *ngIf="registerForm.controls.role.touched && registerForm.controls.role.invalid">
+          Select a role.
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="full register-btn">
+        Register
+      </button>
+
+    </form>
+
+    <div class="login-text">
+      Already have an account?
+      <button mat-button class="redirect-btn" (click)="goToLogin()">Login</button>
+    </div>
+
+  </mat-card>
+
+</div>

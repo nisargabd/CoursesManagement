@@ -406,6 +406,12 @@ onGradeChange(): void {
     this.router.navigate(['/courses/add']);
   }
 
+  logout() {
+  localStorage.clear();
+  this.router.navigate(['/login']);
+}
+
+
   deleteCourse(courseId: string): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',

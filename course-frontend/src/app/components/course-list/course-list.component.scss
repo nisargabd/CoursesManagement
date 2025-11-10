@@ -3,6 +3,16 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #7c90e8 0%, #bc8fe9 100%);
 }
+.actions-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* spacing between buttons */
+}
+
+.logout-btn {
+  height: 40px;
+}
+
 
 // Left Sidebar
 .sidebar {
