@@ -2,6 +2,7 @@ package com.sanketika.course_backend.controllers;
 
 import com.sanketika.course_backend.dto.CourseDto;
 import com.sanketika.course_backend.mapper.ResponseMapper;
+import com.sanketika.course_backend.repositories.CourseRepository;
 import com.sanketika.course_backend.services.CourseService;
 import com.sanketika.course_backend.utils.ApiEnvelope;
 import jakarta.validation.Valid;
@@ -26,6 +27,21 @@ public class CourseController {
 
     @Autowired
     private CourseService courseService;
+
+// ✅ Get ONLY live courses (for users)
+@GetMapping("/public")
+public ResponseEntity<Page<CourseDto>> getLiveCourses(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size) {
+
+    logger.info("Fetching LIVE courses only - page: {}, size: {}", page, size);
+
+    Pageable pageable = PageRequest.of(page, size);
+    Page<CourseDto> liveCourses = courseService.getLiveCourses(pageable);
+
+    return ResponseEntity.ok(liveCourses);
+}
+
 
     //  Get all courses
     @GetMapping("/get")

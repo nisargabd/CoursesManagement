@@ -6,6 +6,9 @@ import com.sanketika.course_backend.authDto.RegisterRequest;
 import com.sanketika.course_backend.entity.User;
 import com.sanketika.course_backend.repositories.UserRepository;
 import com.sanketika.course_backend.security.JwtService;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,35 @@ public class AuthService {
         this.repo = repo;
         this.encoder = encoder;
         this.jwt = jwt;
+    }
+    public String getCurrentUserRole() {
+    var context = SecurityContextHolder.getContext();
+
+    if (context == null || context.getAuthentication() == null) {
+        return null;
+    }
+
+    Object principal = context.getAuthentication().getPrincipal();
+
+    if (principal instanceof UserDetails userDetails) {
+        return userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(a -> a.getAuthority()) // e.g., "ADMIN"
+                .orElse(null);
+    }
+
+    return null;
+}
+public String getCurrentUserEmail() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) return null;
+
+        Object principal = auth.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            return userDetails.getUsername(); // email
+        }
+        return null;
     }
 
     public void register(RegisterRequest req) {

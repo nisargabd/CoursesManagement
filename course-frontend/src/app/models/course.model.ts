@@ -9,6 +9,7 @@ export interface Course {
   grade: string[];
   subject: string[];
   units?: Unit[];
+  status?: 'live' | 'draft';
 }
 
 export interface CourseFilter {

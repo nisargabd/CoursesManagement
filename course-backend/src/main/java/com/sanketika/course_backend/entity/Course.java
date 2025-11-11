@@ -47,6 +47,9 @@ public class Course {
     @JsonManagedReference
     private List<Unit> units = new ArrayList<>();
 
+    @Column(nullable = false)
+    private String status = "live";
+
     public Course(){
     }
 

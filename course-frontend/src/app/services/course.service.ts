@@ -81,4 +81,23 @@ export class CourseService {
   deleteCourse(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/courses/delete/${id}`);
   }
+
+  getPublicCourses(): Observable<Course[]> {
+  return this.http.get<Course[]>(`${this.baseUrl}/courses/public`);
+}
+
+getLiveCourses(page: number = 0, size: number = 10) {
+  return this.http.get<PaginatedResponse<Course>>(
+    `${this.baseUrl}/courses/public?page=${page}&size=${size}`
+  );
+}
+
+getLiveCoursesSimple(): Observable<Course[]> {
+  return this.http.get<PaginatedResponse<Course>>(
+    `${this.baseUrl}/courses/public?page=0&size=1000`
+  ).pipe(map(response => response.content || []));
+}
+
+
+
 }

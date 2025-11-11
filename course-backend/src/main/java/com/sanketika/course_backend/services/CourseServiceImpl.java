@@ -40,6 +40,13 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseMapper courseMapper;
 
+    @Autowired
+    private AuthService authService;
+
+    public Page<CourseDto> getLiveCourses(Pageable pageable) {
+    return courseRepository.findByStatus("live", pageable)
+        .map(courseMapper::toDto);// or your existing mapper logic
+}
 
     public List<String> getAllBoards() {
         return courseRepository.findDistinctBoards();
@@ -95,6 +102,16 @@ public class CourseServiceImpl implements CourseService {
             course.setMedium(dto.getMedium());
             course.setGrade(dto.getGrade());
             course.setSubject(dto.getSubject());
+//             String role = authService.getCurrentUserRole();
+
+// // ✅ Admin can set status
+//                  if ("ADMIN".equals(role)) {
+//                     course.setStatus(dto.getStatus());
+//                 } else {
+//                     // ✅ Others must always be live
+//                     course.setStatus("live");
+//                 }
+            course.setStatus(dto.getStatus()); // New courses are live by default
             
             // Save the course first to get the ID
             Course savedCourse = courseRepository.save(course);
@@ -156,6 +173,7 @@ public class CourseServiceImpl implements CourseService {
     @CachePut(value = "courses", key = "#id")
     public CourseDto updateCourse(UUID id, CourseDto dto) {
         try {
+            String role = authService.getCurrentUserRole();
             Course existing = courseRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
 
@@ -166,6 +184,8 @@ public class CourseServiceImpl implements CourseService {
             existing.setMedium(dto.getMedium());
             existing.setGrade(dto.getGrade());
             existing.setSubject(dto.getSubject());
+            existing.setStatus(dto.getStatus());
+
 
             // Handle units update
             if (dto.getUnits() != null) {

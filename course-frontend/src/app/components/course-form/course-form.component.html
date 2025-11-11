@@ -129,6 +129,21 @@
             Maximum 3 subjects allowed
           </mat-error>
         </mat-form-field>
+<!-- ✅ STATUS (ADMIN ONLY) -->
+<ng-container *ngIf="$any(authService).isAdmin()">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option value="live">Live</mat-option>
+      <mat-option value="draft">Draft</mat-option>
+    </mat-select>
+    <mat-icon matPrefix>visibility</mat-icon>
+
+    <mat-error *ngIf="courseForm.get('status')?.hasError('required')">
+      Status is required
+    </mat-error>
+  </mat-form-field>
+</ng-container>
 
         <!-- ✅ UNITS -->
         <div class="units-section">

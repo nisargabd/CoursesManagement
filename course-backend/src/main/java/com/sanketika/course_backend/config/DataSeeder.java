@@ -252,6 +252,7 @@ public class DataSeeder implements CommandLineRunner {
             dto.setGrade(data.grade);
             dto.setSubject(data.subject);
             dto.setUnits(data.units);
+            dto.setStatus("live");
 
             try {
             courseService.createCourse(dto);

@@ -157,48 +157,75 @@ onGradeChange(): void {
     });
   }
 }
+private handleLoadError() {
+  console.error('Error loading courses');
+  this.courses = [];
+  this.filteredCourses = [];
+  this.totalElements = 0;
+  this.isLoading = false;
+}
+
 
 
   loadCourses(): void {
-    this.isLoading = true;
-    
-    if (this.searchMode || this.searchTerm || this.hasActiveFilters()) {
-      // Load all courses for client-side filtering
+  this.isLoading = true;
+
+  const isAdmin = this.roleService.isAdmin(); // ✅ Check user role
+
+  // ✅ If searching or filtering, load full list
+  if (this.searchMode || this.searchTerm || this.hasActiveFilters()) {
+    if (isAdmin) {
+      // ✅ Admin: load ALL courses
       this.courseService.getAllCoursesSimple().subscribe({
         next: (courses) => {
           this.courses = Array.isArray(courses) ? courses : [];
           this.applyFilters();
-          // In search/filter mode, total should reflect filtered items count
           this.totalElements = this.filteredCourses.length;
           this.isLoading = false;
         },
-        error: (error) => {
-          console.error('Error loading courses:', error);
-          this.courses = [];
-          this.filteredCourses = [];
-          this.totalElements = 0;
-          this.isLoading = false;
-        }
+        error: () => this.handleLoadError()
       });
     } else {
-      // Load paginated courses
-      this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
-        next: (response) => {
-          this.courses = Array.isArray(response.content) ? response.content : [];
-          this.totalElements = response.totalElements || 0;
-          this.filteredCourses = [...this.courses]; // No filtering in pagination mode
+      // ✅ User: load ONLY live courses
+      this.courseService.getLiveCoursesSimple().subscribe({
+        next: (courses) => {
+          this.courses = Array.isArray(courses) ? courses : [];
+          this.applyFilters();
+          this.totalElements = this.filteredCourses.length;
           this.isLoading = false;
         },
-        error: (error) => {
-          console.error('Error loading courses:', error);
-          this.courses = [];
-          this.filteredCourses = [];
-          this.totalElements = 0;
-          this.isLoading = false;
-        }
+        error: () => this.handleLoadError()
       });
     }
+
+    return;
   }
+
+  // ✅ PAGINATION MODE
+  if (isAdmin) {
+    // ✅ Admin: paginated ALL courses
+    this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
+      next: (response) => {
+        this.courses = response.content || [];
+        this.filteredCourses = [...this.courses];
+        this.totalElements = response.totalElements || 0;
+        this.isLoading = false;
+      },
+      error: () => this.handleLoadError()
+    });
+  } else {
+    // ✅ User: paginated LIVE-only courses
+    this.courseService.getLiveCourses(this.currentPage, this.pageSize).subscribe({
+      next: (response) => {
+        this.courses = response.content || [];
+        this.filteredCourses = [...this.courses];
+        this.totalElements = response.totalElements || 0;
+        this.isLoading = false;
+      },
+      error: () => this.handleLoadError()
+    });
+  }
+}
 
   hasActiveFilters(): boolean {
     return !!(this.filters.board || this.filters.medium || this.filters.grade || this.filters.subject);

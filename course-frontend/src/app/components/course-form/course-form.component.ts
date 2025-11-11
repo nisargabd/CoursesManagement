@@ -18,6 +18,7 @@ import { UnitService } from '../../services/unit.service';
 import { FilterOptionsService, FilterOptions } from '../../services/filter-options.service';
 import { Course } from '../../models/course.model';
 import { Unit } from '../../models/unit.model';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-course-form',
@@ -34,8 +35,8 @@ import { Unit } from '../../models/unit.model';
     MatIconModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatProgressSpinnerModule
-    ,ConfirmDialogComponent
+    MatProgressSpinnerModule,
+    ConfirmDialogComponent
   ],
   templateUrl: './course-form.component.html',
   styleUrls: ['./course-form.component.scss']
@@ -64,7 +65,8 @@ export class CourseFormComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public authService: AuthService
   ) {
     this.courseForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3),Validators.maxLength(30)]],
@@ -73,7 +75,8 @@ export class CourseFormComponent implements OnInit {
       medium: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(3)]],
       grade: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(5)]],
       subject: [[], [Validators.required, Validators.minLength(1),Validators.maxLength(3)]],
-      units: [[]]
+      units: [[]],
+      status: ['live']
     });
   }
   private forceRevalidateForm(): void {
@@ -88,28 +91,7 @@ export class CourseFormComponent implements OnInit {
 
   this.courseForm.updateValueAndValidity({ emitEvent: false });
 }
-
-
-  // ngOnInit(): void {
-  //   console.log('CourseFormComponent ngOnInit called');
-    
-  //   // Load filter options first
-  //   this.loadFilterOptions();
-    
-  //   // Get course ID from route
-  //   this.courseId = this.route.snapshot.paramMap.get('id');
-  //   this.isEditMode = !!this.courseId;
-    
-  //   console.log('Course ID:', this.courseId);
-  //   console.log('Is Edit Mode:', this.isEditMode);
-    
-  //   if (this.isEditMode && this.courseId) {
-  //     this.loadCourseForEdit();
-  //   } else {
-  //     this.loading = false;
-  //     this.loadAvailableUnits();
-  //   }
-  // }
+ 
 ngOnInit(): void {  
   this.loadFilterOptions();
 
@@ -258,7 +240,8 @@ setupStepwiseFormValidation(): void {
           medium: course.medium || [],
           grade: course.grade || [],
           subject: course.subject || [],
-          units: course.units || []
+          units: course.units || [],
+          status: course.status || 'live'
         });
         // ✅ Edit mode: ensure ALL controls are enabled
       Object.keys(this.courseForm.controls).forEach(key => {
@@ -333,6 +316,10 @@ setupStepwiseFormValidation(): void {
           content: unit?.content || ''
         };
       });
+      if (!this.authService.isAdmin()) {
+  formValue.status = 'live';
+}
+
       
       const courseData: Course = {
         name: formValue.name,
@@ -341,7 +328,9 @@ setupStepwiseFormValidation(): void {
         medium: formValue.medium,
         grade: formValue.grade,
         subject: formValue.subject,
-        units: unitsForCourse
+        units: unitsForCourse,
+        status: formValue.status
+
       };
 
       console.log('Submitting course data with units:', courseData);

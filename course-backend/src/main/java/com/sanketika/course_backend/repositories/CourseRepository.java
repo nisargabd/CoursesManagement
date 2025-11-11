@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecificationExecutor<Course> {
+    Page<Course> findByStatus(String status, Pageable pageable);
 
     Page<Course> findAll(Pageable pageable);
 

@@ -30,5 +30,7 @@ public class CourseDto {
 
     private List<UnitDto> units;
 
+    private String status;
+
     public CourseDto() {}
 }

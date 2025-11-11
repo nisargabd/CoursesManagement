@@ -16,6 +16,7 @@ public interface CourseService {
      CourseDto createCourse(CourseDto dto);
      CourseDto updateCourse(UUID id,CourseDto dto);
      void deleteCourse(UUID id);
+     Page<CourseDto> getLiveCourses(Pageable pageable);
 //     List<Course> findAllFiltered(String q, String board, String medium, String grade, String subject);
 
 }
