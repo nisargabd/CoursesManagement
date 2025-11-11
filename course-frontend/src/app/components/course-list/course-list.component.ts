@@ -51,7 +51,7 @@ export class CourseListComponent implements OnInit {
   
   // Pagination properties
   totalElements: number = 0;
-  pageSize: number = 5;
+  pageSize: number = 6;
   currentPage: number = 0;
   isLoading: boolean = false;
   
@@ -364,46 +364,34 @@ private handleLoadError() {
     }
   }
 
-  getPageNumbers(): (number | string)[] {
-    const totalPages = this.getTotalPages();
-    const currentPage = this.currentPage;
-    const pageNumbers: (number | string)[] = [];
+ getPageNumbers(): (number | string)[] {
+  const total = this.getTotalPages();
+  const current = this.currentPage;
 
-    if (totalPages <= 7) {
-      // Show all pages if 7 or fewer
-      for (let i = 0; i < totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      // Always show first page
-      pageNumbers.push(0);
-
-      if (currentPage <= 3) {
-        // Show first 5 pages + ellipsis + last page
-        for (let i = 1; i <= 4; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push('...');
-        pageNumbers.push(totalPages - 1);
-      } else if (currentPage >= totalPages - 4) {
-        // Show first page + ellipsis + last 5 pages
-        pageNumbers.push('...');
-        for (let i = totalPages - 5; i < totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        // Show first page + ellipsis + current-1, current, current+1 + ellipsis + last page
-        pageNumbers.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push('...');
-        pageNumbers.push(totalPages - 1);
-      }
-    }
-
-    return pageNumbers;
+  if (total <= 6) {
+    return Array.from({ length: total }, (_, i) => i);
   }
+
+  const pages: (number | string)[] = [];
+
+  pages.push(0);
+
+  if (current > 2) pages.push('...');
+
+  const start = Math.max(1, current - 1);
+  const end = Math.min(total - 2, current + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (current < total - 3) pages.push('...');
+
+  pages.push(total - 1);
+
+  return pages;
+}
+
 
   goToPage(page: number | string): void {
     if (typeof page === 'number' && page !== this.currentPage) {
@@ -413,6 +401,18 @@ private handleLoadError() {
       }
     }
   }
+  onCustomPageSizeChange(): void {
+  if (!this.pageSize || this.pageSize < 1) {
+    this.pageSize = 6; // default fallback
+  }
+
+  this.currentPage = 0;
+
+  if (!this.searchMode) {
+    this.loadCourses();
+  }
+}
+
 
   // Returns the list of courses to display on the current page
   getDisplayedCourses(): Course[] {

@@ -158,55 +158,77 @@
 
       <!-- Pagination Controls -->
       <div *ngIf="!isLoading && ((searchMode ? filteredCourses.length : totalElements) > pageSize)" class="pagination-container">
-        <div class="pagination-left">
-          <span class="rows-per-page-label">Rows per page:</span>
-          <mat-select [(value)]="pageSize" (selectionChange)="onPageSizeChange($event.value)" class="page-size-select">
-            <mat-option *ngFor="let size of [5, 10, 25, 50]" [value]="size">{{ size }}</mat-option>
-          </mat-select>
-        </div>
-        <div class="pagination-center">
-          <span class="pagination-info">{{ getPaginationInfo() }}</span>
-          <div class="pagination-numbers">
-            <button mat-icon-button (click)="goToFirstPage()" [disabled]="currentPage === 0" class="nav-button">
-              <mat-icon>first_page</mat-icon>
-            </button>
-            <button mat-icon-button (click)="goToPreviousPage()" [disabled]="currentPage === 0" class="nav-button">
-              <mat-icon>chevron_left</mat-icon>
-            </button>
-            
-            <!-- Page Numbers -->
-            <div class="page-numbers">
-              <button 
-                *ngFor="let page of getPageNumbers()" 
-                mat-button 
-                [class.active]="page === currentPage"
-                [class.disabled]="page === '...'"
-                (click)="goToPage(page)"
-                [disabled]="page === '...'"
-                class="page-number">
-                {{ page }}
-              </button>
-            </div>
-            
-            <button mat-icon-button (click)="goToNextPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
-              <mat-icon>chevron_right</mat-icon>
-            </button>
-            <button mat-icon-button (click)="goToLastPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
-              <mat-icon>last_page</mat-icon>
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div *ngIf="!isLoading && filteredCourses.length === 0" class="no-results">
-        <mat-icon>search_off</mat-icon>
-        <h3>No courses found</h3>
-        <p>Try adjusting your search criteria or filters.</p>
-        <button mat-raised-button color="primary" (click)="clearFilters()">
-          <mat-icon>refresh</mat-icon>
-          Reset Filters
+  <!-- LEFT SIDE: Rows Per Page -->
+  <div class="pagination-left">
+    <span class="rows-per-page-label">Rows per page:</span>
+
+    <!-- ✅ NEW: Numeric Input Instead of Mat-Select -->
+    <input 
+      type="number"
+      class="page-size-input"
+      [(ngModel)]="pageSize"
+      (change)="onCustomPageSizeChange()"
+      min="1"
+      max="100"
+    />
+  </div>
+
+  <!-- CENTER: Pagination Info + Navigation -->
+  <div class="pagination-center">
+    <span class="pagination-info">{{ getPaginationInfo() }}</span>
+
+    <div class="pagination-numbers">
+
+      <!-- First Page -->
+      <button mat-icon-button (click)="goToFirstPage()" [disabled]="currentPage === 0" class="nav-button">
+        <mat-icon>first_page</mat-icon>
+      </button>
+
+      <!-- Previous Page -->
+      <button mat-icon-button (click)="goToPreviousPage()" [disabled]="currentPage === 0" class="nav-button">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <!-- Page Numbers -->
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          mat-button 
+          [class.active]="page === currentPage"
+          [class.disabled]="page === '...'"
+          (click)="goToPage(page)"
+          [disabled]="page === '...'"
+          class="page-number">
+          {{ page }}
         </button>
       </div>
+
+      <!-- Next Page -->
+      <button mat-icon-button (click)="goToNextPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+
+      <!-- Last Page -->
+      <button mat-icon-button (click)="goToLastPage()" [disabled]="currentPage >= getTotalPages() - 1" class="nav-button">
+        <mat-icon>last_page</mat-icon>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- No Results -->
+<div *ngIf="!isLoading && filteredCourses.length === 0" class="no-results">
+  <mat-icon>search_off</mat-icon>
+  <h3>No courses found</h3>
+  <p>Try adjusting your search criteria or filters.</p>
+  <button mat-raised-button color="primary" (click)="clearFilters()">
+    <mat-icon>refresh</mat-icon>
+    Reset Filters
+  </button>
+</div>
+
     </div>
   </main>
 </div>
