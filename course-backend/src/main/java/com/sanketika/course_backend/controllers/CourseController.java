@@ -2,7 +2,7 @@ package com.sanketika.course_backend.controllers;
 
 import com.sanketika.course_backend.dto.CourseDto;
 import com.sanketika.course_backend.mapper.ResponseMapper;
-import com.sanketika.course_backend.repositories.CourseRepository;
+//  import com.sanketika.course_backend.repositories.CourseRepository;
 import com.sanketika.course_backend.services.CourseService;
 import com.sanketika.course_backend.utils.ApiEnvelope;
 import jakarta.validation.Valid;
@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 // import java.util.List;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -45,7 +46,7 @@ public ResponseEntity<Page<CourseDto>> getLiveCourses(
 
     //  Get all courses
     @GetMapping("/get")
-    public ResponseEntity<Page<CourseDto>> getAllCourses(
+    public ResponseEntity<List<CourseDto>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
         logger.info("Request received to fetch all courses - page: {}, size: {}", page, size);

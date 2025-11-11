@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mydb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    networks:
+      - course_network
+
+  radis:
+    image: redis:7-alpine
+    container_name: myredis
+    ports:
+      - "6379:6379"
+    networks:
+      - course_network
+  
+  course_backend:
+    build:
+      context: ./course-backend
+      dockerfile: Dockerfile.backend co
+    container_name: course_backend_new
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+
+      SPRING_REDIS_HOST: radis
+      SPRING_REDIS_PORT: 6379
+
+    depends_on:
+      - db
+      - redis
+    
+    ports:
+      - "9099:9099"
+    
+    networks:
+      - course_network
+  
+  networks:
+    course_network:
+      driver: bridge

@@ -6,10 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 // import java.util.List;
+import java.util.List;
 import java.util.UUID;
 
 public interface CourseService {
-     Page<CourseDto> getAllCourses(Pageable p);
+     List<CourseDto> getAllCourses(Pageable p);
 
 
      CourseDto getCourseById(UUID id);

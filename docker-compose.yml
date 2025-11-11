@@ -1,7 +1,7 @@
 
 services:
   db:
-    image: postgres:15
+    image: postgres:15-alpine # Use lightweight Postgres image, eg alpine variant if available
     container_name: course_db
     environment:
       POSTGRES_USER: postgres
@@ -16,8 +16,11 @@ services:
     restart: unless-stopped
 
   backend:
-    image: course-backend
-    container_name: course_backend
+    # image: course-backend
+    build: 
+      context: ./course-backend
+      dockerfile: Dockerfile.backend
+    container_name: backend
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://course_db:5432/course_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -31,8 +34,12 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: course-frontend
-    container_name: course_frontend
+    # image: course-frontend
+    # Pass Dockerfile here if needed for custom build
+    build: 
+      context: ./course-frontend
+      dockerfile: Dockerfile.frontend
+    container_name: frontend
     ports:
       - "4200:80"
     depends_on:

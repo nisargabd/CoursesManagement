@@ -66,10 +66,15 @@ public class CourseServiceImpl implements CourseService {
 }
 
     @Override
-    public Page<CourseDto> getAllCourses(Pageable p) {
+    @Cacheable(value = "allCourses", key = "#p.pageNumber")
+    public List<CourseDto> getAllCourses(Pageable p) {
         Page<Course> page = courseRepository.findAll(p);
-        return page.map(courseMapper::toDto);
+        logger.info("🔍 Fetching ALL courses from DB!");
+
+        return page.map(courseMapper::toDto).getContent();
     }
+
+
 
     @Override
     @Cacheable(value = "courses", key = "#id")
@@ -102,15 +107,7 @@ public class CourseServiceImpl implements CourseService {
             course.setMedium(dto.getMedium());
             course.setGrade(dto.getGrade());
             course.setSubject(dto.getSubject());
-//             String role = authService.getCurrentUserRole();
 
-// // ✅ Admin can set status
-//                  if ("ADMIN".equals(role)) {
-//                     course.setStatus(dto.getStatus());
-//                 } else {
-//                     // ✅ Others must always be live
-//                     course.setStatus("live");
-//                 }
             course.setStatus(dto.getStatus()); // New courses are live by default
             
             // Save the course first to get the ID
