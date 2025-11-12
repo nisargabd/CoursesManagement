@@ -10,14 +10,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CourseService {
-     List<CourseDto> getAllCourses(Pageable p);
-
-
-     CourseDto getCourseById(UUID id);
-     CourseDto createCourse(CourseDto dto);
-     CourseDto updateCourse(UUID id,CourseDto dto);
-     void deleteCourse(UUID id);
-     Page<CourseDto> getLiveCourses(Pageable pageable);
+     Page<CourseDto> getAllCourses(Pageable pageable);
+    Page<CourseDto> getLiveCourses(Pageable pageable);
+    CourseDto getCourseById(UUID id);
+    CourseDto createCourse(CourseDto dto);
+    CourseDto updateCourse(UUID id, CourseDto dto);
+    void deleteCourse(UUID courseId);
 //     List<Course> findAllFiltered(String q, String board, String medium, String grade, String subject);
 
 }

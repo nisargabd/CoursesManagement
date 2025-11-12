@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,7 +33,7 @@ public class CourseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
-        logger.info("Fetching LIVE courses only - page: {}, size: {}", page, size);
+        logger.info("📗 Fetching LIVE courses only - page={}, size={}", page, size);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<CourseDto> liveCourses = courseService.getLiveCourses(pageable);
@@ -50,19 +49,19 @@ public class CourseController {
 
     // ✅ Get ALL courses (for admin)
     @GetMapping("/get")
-    public ResponseEntity<ApiEnvelope<List<CourseDto>>> getAllCourses(
+    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
-        logger.info("Request received to fetch all courses - page: {}, size: {}", page, size);
+        logger.info("📘 Request received to fetch ALL courses - page={}, size={}", page, size);
+
         Pageable pageable = PageRequest.of(page, size);
+        Page<CourseDto> allCoursesPage = courseService.getAllCourses(pageable);
 
-        List<CourseDto> allCourses = courseService.getAllCourses(pageable);
-
-        ApiEnvelope<List<CourseDto>> response = ResponseMapper.success(
+        ApiEnvelope<Page<CourseDto>> response = ResponseMapper.success(
                 "api.course.getAll",
                 "All courses fetched successfully",
-                allCourses
+                allCoursesPage
         );
 
         return ResponseEntity.ok(response);
@@ -71,7 +70,8 @@ public class CourseController {
     // ✅ Get course by ID
     @GetMapping("/get/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> getCourseById(@PathVariable UUID id) {
-        logger.info("Fetching course with ID: {}", id);
+        logger.info("📘 Fetching course with ID: {}", id);
+
         CourseDto course = courseService.getCourseById(id);
 
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
@@ -80,15 +80,16 @@ public class CourseController {
                 course
         );
 
-        logger.info("Successfully fetched course: {}", id);
+        logger.info("✅ Successfully fetched course: {}", id);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Create course
+    // ✅ Create course (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiEnvelope<CourseDto>> createCourse(@Valid @RequestBody CourseDto dto) {
-        logger.info("Creating new course: {}", dto.getName());
+        logger.info("🆕 Creating new course: {}", dto.getName());
+
         CourseDto created = courseService.createCourse(dto);
 
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
@@ -97,18 +98,19 @@ public class CourseController {
                 created
         );
 
-        logger.info("Course created successfully with ID: {}", created.getId());
+        logger.info("✅ Course created successfully with ID: {}", created.getId());
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Update course
+    // ✅ Update course (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(
             @PathVariable UUID id,
             @Valid @RequestBody CourseDto dto) {
 
-        logger.info("Updating course with ID: {}", id);
+        logger.info("📝 Updating course with ID: {}", id);
+
         CourseDto updated = courseService.updateCourse(id, dto);
 
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
@@ -117,15 +119,16 @@ public class CourseController {
                 updated
         );
 
-        logger.info("Course updated successfully: {}", id);
+        logger.info("✅ Course updated successfully: {}", id);
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Delete course
+    // ✅ Delete course (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiEnvelope<Void>> deleteCourse(@PathVariable UUID id) {
-        logger.warn("Deleting course with ID: {}", id);
+        logger.warn("🗑️ Deleting course with ID: {}", id);
+
         courseService.deleteCourse(id);
 
         ApiEnvelope<Void> response = ResponseMapper.success(
@@ -134,7 +137,7 @@ public class CourseController {
                 null
         );
 
-        logger.info("Course deleted: {}", id);
+        logger.info("✅ Course deleted: {}", id);
         return ResponseEntity.ok(response);
     }
 }
