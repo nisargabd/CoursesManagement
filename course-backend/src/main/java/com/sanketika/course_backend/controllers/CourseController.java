@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 // import java.util.List;
@@ -69,6 +70,7 @@ public ResponseEntity<Page<CourseDto>> getLiveCourses(
     }
 
     //  Create course
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiEnvelope<CourseDto>> createCourse(@Valid @RequestBody CourseDto dto) {
         logger.info("Creating new course: {}", dto.getName());
@@ -83,6 +85,7 @@ public ResponseEntity<Page<CourseDto>> getLiveCourses(
     }
 
     // Update course
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseDto dto) {
         logger.info("Updating course with ID: {}", id);
@@ -97,6 +100,7 @@ public ResponseEntity<Page<CourseDto>> getLiveCourses(
     }
 
     //  Delete course
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiEnvelope<Void>> deleteCourse(@PathVariable UUID id) {
         logger.warn("Deleting course with ID: {}", id);
