@@ -1,13 +1,13 @@
 /* ------------------------------
-   COURSE FORM - PROFESSIONAL DESIGN
-   Clean, Responsive, and Modern
+   PROFESSIONAL COURSE FORM (Final)
+   Clean, Colorful & Clearly Defined Inputs
 ---------------------------------*/
 
 .course-form-container {
-  max-width: 900px;
+  max-width: 950px;
   margin: 0 auto;
   padding: 40px;
-  background: linear-gradient(180deg, #f8faff 0%, #eef2f6 100%);
+  background: linear-gradient(180deg, #f4f7fb 0%, #edf1f6 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -18,149 +18,152 @@
 /* ---------- HEADER ---------- */
 .form-header {
   display: flex;
-  justify-content: center; /* center title */
+  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #ffffff 0%, #f7f9fc 100%);
+  background: #ffffff;
   padding: 20px 28px;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e3e7ee;
+  border-radius: 12px;
+  border: 1px solid #d6dce5;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 
   h1 {
     margin: 0;
     font-size: 26px;
-    font-weight: 800;
-    color: #1976d2; /* standard primary */
+    font-weight: 700;
+    color: #1976d2;
     letter-spacing: -0.3px;
-    text-align: center;
-  }
-
-  .close-button {
-    color: #6b7280;
-    transition: all 0.3s ease;
-    border-radius: 50%;
-
-    &:hover {
-      background: #f3f4f6;
-      color: #111827;
-      transform: rotate(90deg);
-    }
   }
 }
 
-/* ---------- CARD & FORM ---------- */
+/* ---------- CARD ---------- */
 .course-form-card {
   border-radius: 14px;
   background: #ffffff;
-  border: 1px solid #e5e8ee;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
+  border: 1px solid #c9d1dc;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(25, 118, 210, 0.1);
   }
 
   mat-card-content {
-    padding: 36px;
+    padding: 40px;
   }
 }
 
+/* ---------- FIELDS ---------- */
 .full-width {
   width: 100%;
   margin-bottom: 28px;
 
   ::ng-deep {
     .mat-mdc-form-field {
-      background: #ffffff;
+      background: #f9fbff;
       border-radius: 10px;
-      transition: box-shadow 0.2s ease, border 0.2s ease;
-      border: 1px solid #e3e7ee;
-      --mdc-outlined-text-field-outline-color: #d6dde7;
-      --mdc-outlined-text-field-hover-outline-color: #c4cfdd;
-      --mdc-outlined-text-field-focus-outline-color: #1976d2;
-      padding: 6px 12px;
-
-      &:focus-within {
-        border-color: #1976d2;
-        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
-      }
+      border: 2px solid #c2c9d4 !important;
+      padding: 8px 12px;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
     }
 
-    .mat-mdc-form-field-label {
-      color: #5f6368 !important;
-      font-size: 14px !important;
-      font-weight: 500 !important;
+    .mat-mdc-form-field:hover {
+      border-color: #aab5c5 !important;
+      background: #ffffff;
+    }
+
+    .mat-mdc-form-field:focus-within {
+      border-color: #1976d2 !important;
+      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+      background: #ffffff;
     }
 
     input,
-    textarea {
-      font-size: 15px;
-      color: #202124;
-      font-weight: 500;
-      padding: 8px 4px;
-
-      &::placeholder {
-        color: #9aa0a6;
-        font-weight: 400;
-      }
-    }
-
+    textarea,
     .mat-mdc-select {
-      font-size: 15px;
+      font-size: 15px !important;
+      color: #222 !important;
       font-weight: 500;
+      padding: 10px 4px;
     }
 
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    /* Label */
+    .mat-mdc-form-field-label {
+      color: #444 !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+    }
+
+    /* Options */
     .mat-mdc-option {
       border-radius: 6px;
       transition: all 0.2s ease;
-      margin: 4px 6px;
+      margin: 2px 6px;
 
       &:hover {
-        background: #f2f7ff;
+        background: #f0f6ff;
         color: #1976d2;
       }
 
       &.mdc-list-item--selected {
         background: #e3f2fd !important;
+        color: #1976d2 !important;
         font-weight: 600;
-        color: #1976d2;
       }
     }
-
-    mat-icon.mat-mdc-form-field-icon {
-      color: #1976d2;
-    }
   }
+}
+
+/* ---------- COLORFUL ICONS ---------- */
+::ng-deep mat-icon.mat-mdc-form-field-icon {
+  font-size: 20px;
+  margin-right: 8px;
+  opacity: 0.9;
+  transition: color 0.3s ease;
+
+  &[data-icon='book'] { color: #1976d2 !important; }          /* blue */
+  &[data-icon='description'] { color: #7b1fa2 !important; }   /* purple */
+  &[data-icon='account_balance'] { color: #0288d1 !important; } /* cyan */
+  &[data-icon='language'] { color: #00897b !important; }      /* teal */
+  &[data-icon='school'] { color: #f57c00 !important; }        /* orange */
+  &[data-icon='class'] { color: #43a047 !important; }         /* green */
+  &[data-icon='visibility'] { color: #455a64 !important; }    /* gray */
+  &[data-icon='list'] { color: #5e35b1 !important; }          /* deep purple */
 }
 
 /* ---------- UNITS SECTION ---------- */
 .units-section {
   margin-top: 40px;
-  background: linear-gradient(135deg, #f5f9ff 0%, #f9f5ff 100%);
-  padding: 24px;
+  background: #f7faff;
+  border: 2px solid #d3dae5;
   border-radius: 12px;
-  border: 1px solid #e3e7ee;
-  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.08);
+  padding: 28px;
+  box-shadow: 0 2px 10px rgba(25, 118, 210, 0.08);
 
   .units-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 
     h3 {
       margin: 0;
-      color: #1976d2;
       font-size: 18px;
       font-weight: 700;
+      color: #1976d2;
       display: flex;
       align-items: center;
       gap: 8px;
 
       &::before {
-        content: '📘';
+        content: "📘";
         font-size: 20px;
       }
     }
@@ -168,175 +171,85 @@
     button {
       border-radius: 8px;
       font-weight: 600;
+      background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
+      color: #fff;
       padding: 6px 20px;
-      letter-spacing: 0.3px;
-      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.25);
+      transition: all 0.25s ease;
 
       &:hover {
-        background: #1976d2;
-        color: white;
         transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
+        box-shadow: 0 5px 12px rgba(25, 118, 210, 0.3);
       }
     }
   }
 
   .no-units-message {
-    background: white;
+    background: #ffffff;
+    border: 1px solid #e3e7ee;
     border-radius: 8px;
     padding: 16px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: #6b7280;
+    gap: 10px;
+    color: #555;
     font-weight: 500;
 
     mat-icon {
-      color: #ffa726;
-    }
-  }
-
-  .selected-units {
-    margin-top: 16px;
-    padding: 16px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 1px #e3e7ee;
-
-    h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #5f6368;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-
-    .selected-units-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
-
-    /* Ensure each unit row is a single line with action on the far right */
-    .unit-item {
-      display: flex;
-      align-items: center;
-      flex-direction: row;
-      width: 100%;
-      gap: 12px;
-    }
-
-    .unit-title {
-      flex: 1 1 auto;
-      margin-right: 12px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .delete-unit-btn {
-      margin-left: auto;
+      color: #f9a825;
     }
   }
 }
 
 /* ---------- ACTION BUTTONS ---------- */
 mat-card-actions {
-  padding: 20px 36px;
+  padding: 20px 40px;
   background: #fafbfc;
-  border-top: 1px solid #e3e7ee;
+  border-top: 1px solid #d6dce5;
   display: flex;
   justify-content: flex-end;
   gap: 16px;
 
   button {
     height: 46px;
-    padding: 0 28px;
     border-radius: 8px;
     font-weight: 600;
-    letter-spacing: 0.4px;
+    letter-spacing: 0.3px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.3s ease;
+    gap: 8px;
+    transition: all 0.25s ease;
 
-    &[color='primary'] {
+    &.app-btn--primary {
       background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
-      color: white;
+      color: #fff;
       box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
 
-      &:hover:not(:disabled) {
+      &:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
       }
     }
 
-    &:not([color='primary']) {
+    &.app-btn--ghost {
       background: #f4f5f7;
-      color: #374151;
+      color: #333;
 
       &:hover {
         background: #e5e7eb;
       }
     }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-}
-
-/* ---------- LOADING STATE ---------- */
-.loading-container {
-  text-align: center;
-  background: white;
-  border-radius: 12px;
-  padding: 80px 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-
-  mat-icon {
-    font-size: 60px;
-    color: #1976d2;
-    margin-bottom: 16px;
-    animation: spin 1.8s linear infinite;
-  }
-
-  p {
-    font-size: 16px;
-    color: #5f6368;
-    font-weight: 500;
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
   .course-form-container {
-    padding: 20px;
-  }
-
-  .form-header {
-    flex-direction: column;
-    gap: 12px;
-    padding: 16px;
+    padding: 24px 16px;
   }
 
   .course-form-card mat-card-content {
-    padding: 20px;
-  }
-
-  .units-section {
-    padding: 16px;
+    padding: 24px;
   }
 
   mat-card-actions {
