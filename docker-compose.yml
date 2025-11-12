@@ -1,7 +1,8 @@
+version: '3.9'
 
 services:
   db:
-    image: postgres:15-alpine # Use lightweight Postgres image, eg alpine variant if available
+    image: postgres:15-alpine 
     container_name: course_db
     environment:
       POSTGRES_USER: postgres
@@ -15,8 +16,18 @@ services:
       - course
     restart: unless-stopped
 
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: course_redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data 
+  #   networks:
+  #     - course
+  #   restart: unless-stopped
+
   backend:
-    # image: course-backend
     build: 
       context: ./course-backend
       dockerfile: Dockerfile.backend
@@ -25,17 +36,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://course_db:5432/course_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: root
+      SPRING_REDIS_HOST: course_redis  
+      SPRING_REDIS_PORT: 6379
     ports:
       - "9099:9099"
     depends_on:
       - db
+      # - redis
     networks:
       - course
     restart: unless-stopped
 
   frontend:
-    # image: course-frontend
-    # Pass Dockerfile here if needed for custom build
     build: 
       context: ./course-frontend
       dockerfile: Dockerfile.frontend
@@ -50,6 +62,8 @@ services:
 
 volumes:
   db_data:
+  redis_data:  
 
 networks:
   course:
+    driver: bridge

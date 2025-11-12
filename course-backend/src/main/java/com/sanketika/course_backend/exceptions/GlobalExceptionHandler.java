@@ -3,6 +3,8 @@ package com.sanketika.course_backend.exceptions;
 import com.sanketika.course_backend.utils.ApiEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,10 +20,22 @@ import java.util.UUID;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    // -----------------------------
+    // ✅ Handle Redis Connection Failures
+    // -----------------------------
+    @ExceptionHandler({RedisConnectionFailureException.class, DataAccessResourceFailureException.class})
+    public void handleRedisUnavailable(Exception ex) {
+        logger.warn("⚠️ Redis unavailable, skipping cache and serving data from DB: {}", ex.getMessage());
+        // No ResponseEntity returned — allows controller to proceed
+    }
 
-    // Handle custom "not found" errors (like missing course or unit)
+
+    // -----------------------------
+    // Handle resource not found
+    // -----------------------------
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiEnvelope<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
         ApiEnvelope<Void> response = new ApiEnvelope<>();
@@ -37,11 +51,20 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+
+    // -----------------------------
+    // Handle invalid URL
+    // -----------------------------
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException ex) {
         logger.warn("URL not found: {}", ex.getRequestURL());
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "The requested URL " + ex.getRequestURL() + " was not found.");
+        return buildErrorResponse(HttpStatus.NOT_FOUND,
+                "The requested URL " + ex.getRequestURL() + " was not found.");
     }
+
+    // -----------------------------
+    // Handle validation failures
+    // -----------------------------
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiEnvelope<Void>> handleValidationException(MethodArgumentNotValidException ex) {
         StringBuilder errorMessage = new StringBuilder();
@@ -64,9 +87,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // Handle unexpected runtime errors
+    // -----------------------------
+    // Handle runtime errors
+    // -----------------------------
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiEnvelope<Void>> handleRuntimeException(RuntimeException ex) {
+        logger.error("❌ Runtime exception: {}", ex.getMessage(), ex);
+
         ApiEnvelope<Void> response = new ApiEnvelope<>();
         response.setId("api.error");
         response.setVer("v1");
@@ -81,9 +108,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    // Handle all other exceptions (generic fallback)
+    // -----------------------------
+    // Fallback generic handler
+    // -----------------------------
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiEnvelope<Void>> handleGenericException(Exception ex) {
+        logger.error("❌ Generic exception: {}", ex.getMessage(), ex);
+
         ApiEnvelope<Void> response = new ApiEnvelope<>();
         response.setId("api.error");
         response.setVer("v1");
@@ -97,6 +128,10 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    // -----------------------------
+    // Helper for URL not found
+    // -----------------------------
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());

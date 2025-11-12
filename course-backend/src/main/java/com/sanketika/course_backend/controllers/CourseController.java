@@ -2,7 +2,6 @@ package com.sanketika.course_backend.controllers;
 
 import com.sanketika.course_backend.dto.CourseDto;
 import com.sanketika.course_backend.mapper.ResponseMapper;
-//  import com.sanketika.course_backend.repositories.CourseRepository;
 import com.sanketika.course_backend.services.CourseService;
 import com.sanketika.course_backend.utils.ApiEnvelope;
 import jakarta.validation.Valid;
@@ -16,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-// import java.util.List;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,86 +28,112 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-// ✅ Get ONLY live courses (for users)
-@GetMapping("/public")
-public ResponseEntity<Page<CourseDto>> getLiveCourses(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "5") int size) {
-
-    logger.info("Fetching LIVE courses only - page: {}, size: {}", page, size);
-
-    Pageable pageable = PageRequest.of(page, size);
-    Page<CourseDto> liveCourses = courseService.getLiveCourses(pageable);
-
-    return ResponseEntity.ok(liveCourses);
-}
-
-
-    //  Get all courses
-    @GetMapping("/get")
-    public ResponseEntity<List<CourseDto>> getAllCourses(
+    // ✅ Get ONLY live courses (for users)
+    @GetMapping("/public")
+    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getLiveCourses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
+
+        logger.info("Fetching LIVE courses only - page: {}, size: {}", page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CourseDto> liveCourses = courseService.getLiveCourses(pageable);
+
+        ApiEnvelope<Page<CourseDto>> response = ResponseMapper.success(
+                "api.course.public",
+                "Live courses fetched successfully",
+                liveCourses
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    // ✅ Get ALL courses (for admin)
+    @GetMapping("/get")
+    public ResponseEntity<ApiEnvelope<List<CourseDto>>> getAllCourses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
         logger.info("Request received to fetch all courses - page: {}, size: {}", page, size);
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(courseService.getAllCourses(pageable));
 
+        List<CourseDto> allCourses = courseService.getAllCourses(pageable);
+
+        ApiEnvelope<List<CourseDto>> response = ResponseMapper.success(
+                "api.course.getAll",
+                "All courses fetched successfully",
+                allCourses
+        );
+
+        return ResponseEntity.ok(response);
     }
-    
+
+    // ✅ Get course by ID
     @GetMapping("/get/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> getCourseById(@PathVariable UUID id) {
         logger.info("Fetching course with ID: {}", id);
         CourseDto course = courseService.getCourseById(id);
+
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
                 "api.course.get",
                 "Course fetched successfully",
                 course
         );
+
         logger.info("Successfully fetched course: {}", id);
         return ResponseEntity.ok(response);
     }
 
-    //  Create course
+    // ✅ Create course
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiEnvelope<CourseDto>> createCourse(@Valid @RequestBody CourseDto dto) {
         logger.info("Creating new course: {}", dto.getName());
         CourseDto created = courseService.createCourse(dto);
+
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
                 "api.course.create",
                 "Course created successfully",
                 created
         );
+
         logger.info("Course created successfully with ID: {}", created.getId());
         return ResponseEntity.ok(response);
     }
 
-    // Update course
+    // ✅ Update course
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseDto dto) {
+    public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(
+            @PathVariable UUID id,
+            @Valid @RequestBody CourseDto dto) {
+
         logger.info("Updating course with ID: {}", id);
         CourseDto updated = courseService.updateCourse(id, dto);
+
         ApiEnvelope<CourseDto> response = ResponseMapper.success(
                 "api.course.update",
                 "Course updated successfully",
                 updated
         );
+
         logger.info("Course updated successfully: {}", id);
         return ResponseEntity.ok(response);
     }
 
-    //  Delete course
+    // ✅ Delete course
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiEnvelope<Void>> deleteCourse(@PathVariable UUID id) {
         logger.warn("Deleting course with ID: {}", id);
         courseService.deleteCourse(id);
+
         ApiEnvelope<Void> response = ResponseMapper.success(
                 "api.course.delete",
                 "Course deleted successfully",
                 null
         );
+
         logger.info("Course deleted: {}", id);
         return ResponseEntity.ok(response);
     }

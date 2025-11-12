@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,9 +28,7 @@ import java.util.UUID;
 @Transactional
 public class CourseServiceImpl implements CourseService {
 
-
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
-
 
     @Autowired
     private CourseRepository courseRepository;
@@ -43,10 +42,11 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private AuthService authService;
 
+    // Get live courses
     public Page<CourseDto> getLiveCourses(Pageable pageable) {
-    return courseRepository.findByStatus("live", pageable)
-        .map(courseMapper::toDto);// or your existing mapper logic
-}
+        return courseRepository.findByStatus("live", pageable)
+                .map(courseMapper::toDto);
+    }
 
     public List<String> getAllBoards() {
         return courseRepository.findDistinctBoards();
@@ -60,46 +60,47 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findDistinctGradeByBoardAndMediums(board, mediums);
     }
 
+    public List<String> getSubjectsByBoardMediumAndGrade(String board, List<String> mediums, List<String> grades) {
+        return courseRepository.findDistinctSubjectsByBoardMediumsAndGrades(board, mediums, grades);
+    }
 
-   public List<String> getSubjectsByBoardMediumAndGrade(String board, List<String> mediums, List<String> grades) {
-    return courseRepository.findDistinctSubjectsByBoardMediumsAndGrades(board, mediums, grades);
-}
-
+    // ✅ Fetch all courses with cache fallback
     @Override
     @Cacheable(value = "allCourses", key = "#p.pageNumber")
     public List<CourseDto> getAllCourses(Pageable p) {
-        Page<Course> page = courseRepository.findAll(p);
-        logger.info("🔍 Fetching ALL courses from DB!");
-
-        return page.map(courseMapper::toDto).getContent();
+        try {
+            logger.info("🗂 Fetching all courses (checking cache/DB)...");
+            Page<Course> page = courseRepository.findAll(p);
+            logger.info("🔍 Fetched ALL courses from DB!");
+            return page.map(courseMapper::toDto).getContent();
+        } catch (RedisConnectionFailureException e) {
+            logger.warn("⚠️ Redis unavailable, serving data directly from DB: {}", e.getMessage());
+            return courseRepository.findAll(p).map(courseMapper::toDto).getContent();
+        }
     }
 
-
-
+    // ✅ Get course by ID with Redis fallback
     @Override
     @Cacheable(value = "courses", key = "#id")
     public CourseDto getCourseById(UUID id) {
         try {
             Course course = courseRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
-            logger.info("Fetching course from DB with ID {}", id);
+            logger.info("📘 Fetching course from DB with ID {}", id);
             return courseMapper.toDto(course);
-        } catch (ResourceNotFoundException ex) {
-            logger.error("Course not found with ID {}: {}", id, ex.getMessage());
-            throw ex; // rethrow to be handled by GlobalExceptionHandler
-        } catch (Exception ex) {
-            logger.error("Unexpected error while fetching course with ID {}", id, ex);
-            throw ex;
+        } catch (RedisConnectionFailureException e) {
+            logger.warn("⚠️ Redis unavailable, reading directly from DB: {}", e.getMessage());
+            Course course = courseRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
+            return courseMapper.toDto(course);
         }
     }
 
-
+    // ✅ Create course (no cache)
     @Override
     public CourseDto createCourse(CourseDto dto) {
         try {
-            logger.info("Creating new course: {}", dto.getName());
-            
-            // Create the course entity without units first
+            logger.info("🆕 Creating new course: {}", dto.getName());
             Course course = new Course();
             course.setName(dto.getName());
             course.setDescription(dto.getDescription());
@@ -107,74 +108,40 @@ public class CourseServiceImpl implements CourseService {
             course.setMedium(dto.getMedium());
             course.setGrade(dto.getGrade());
             course.setSubject(dto.getSubject());
+            course.setStatus(dto.getStatus());
 
-            course.setStatus(dto.getStatus()); // New courses are live by default
-            
-            // Save the course first to get the ID
             Course savedCourse = courseRepository.save(course);
-            logger.info("Course saved with ID: {}", savedCourse.getId());
-            
-            // Handle units separately
+            logger.info("✅ Course saved with ID: {}", savedCourse.getId());
+
             if (dto.getUnits() != null && !dto.getUnits().isEmpty()) {
                 List<Unit> unitsToAssociate = new ArrayList<>();
-                
                 for (UnitDto unitDto : dto.getUnits()) {
-                    if (unitDto.getId() != null) {
-                        // This is an existing unit - fetch it and associate with the course
-                        try {
-                            Unit existingUnit = unitRepository.findById(unitDto.getId())
-                                    .orElseThrow(() -> new ResourceNotFoundException("Unit not found with ID: " + unitDto.getId()));
-                            
-                            // Disconnect from previous course if any
-                            existingUnit.setCourse(null);
-                            unitRepository.save(existingUnit);
-                            
-                            // Associate with new course
-                            existingUnit.setCourse(savedCourse);
-                            unitsToAssociate.add(existingUnit);
-                            
-                            logger.info("Associated existing unit {} with new course {}", unitDto.getId(), savedCourse.getId());
-                        } catch (ResourceNotFoundException ex) {
-                            logger.warn("Unit with ID {} not found, skipping: {}", unitDto.getId(), ex.getMessage());
-                        }
-                    } else {
-                        // This is a new unit - create it
-                        Unit newUnit = new Unit();
-                        newUnit.setTitle(unitDto.getTitle());
-                        newUnit.setContent(unitDto.getContent());
-                        newUnit.setCourse(savedCourse);
-                        unitsToAssociate.add(newUnit);
-                        
-                        logger.info("Created new unit for course {}", savedCourse.getId());
-                    }
+                    Unit newUnit = new Unit();
+                    newUnit.setTitle(unitDto.getTitle());
+                    newUnit.setContent(unitDto.getContent());
+                    newUnit.setCourse(savedCourse);
+                    unitsToAssociate.add(newUnit);
                 }
-                
-                // Save all units
-                if (!unitsToAssociate.isEmpty()) {
-                    unitRepository.saveAll(unitsToAssociate);
-                    savedCourse.setUnits(unitsToAssociate);
-                    logger.info("Associated {} units with course {}", unitsToAssociate.size(), savedCourse.getId());
-                }
+                unitRepository.saveAll(unitsToAssociate);
+                savedCourse.setUnits(unitsToAssociate);
+                logger.info("🧩 Associated {} units with course {}", unitsToAssociate.size(), savedCourse.getId());
             }
-            
-            logger.info("Course creation completed successfully with ID: {}", savedCourse.getId());
+
             return courseMapper.toDto(savedCourse);
-            
         } catch (Exception ex) {
-            logger.error("Error creating course: {}", ex.getMessage(), ex);
+            logger.error("❌ Error creating course: {}", ex.getMessage(), ex);
             throw ex;
         }
     }
 
+    // ✅ Update course and refresh cache
     @Override
     @CachePut(value = "courses", key = "#id")
     public CourseDto updateCourse(UUID id, CourseDto dto) {
         try {
-            String role = authService.getCurrentUserRole();
             Course existing = courseRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
 
-            // Update basic course fields
             existing.setName(dto.getName());
             existing.setDescription(dto.getDescription());
             existing.setBoard(dto.getBoard());
@@ -183,97 +150,43 @@ public class CourseServiceImpl implements CourseService {
             existing.setSubject(dto.getSubject());
             existing.setStatus(dto.getStatus());
 
-
-            // Handle units update
-            if (dto.getUnits() != null) {
-                // Get current units
-                List<Unit> currentUnits = existing.getUnits();
-                
-                // Collect IDs of units from DTO
-                List<UUID> dtoUnitIds = dto.getUnits().stream()
-                        .map(UnitDto::getId)
-                        .filter(unitId -> unitId != null)
-                        .toList();
-
-                // Step 1: Disconnect units that are no longer in the DTO
-                List<Unit> unitsToRemove = new ArrayList<>();
-                for (Unit unit : currentUnits) {
-                    if (!dtoUnitIds.contains(unit.getId())) {
-                        unit.setCourse(null);
-                        unitsToRemove.add(unit);
-                    }
-                }
-                currentUnits.removeAll(unitsToRemove);
-
-                // Step 2: Add or update units from DTO
-                for (UnitDto unitDto : dto.getUnits()) {
-                    if (unitDto.getId() != null) {
-                        // Fetch the unit from database
-                        Unit unit = unitRepository.findById(unitDto.getId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Unit not found with ID: " + unitDto.getId()));
-                        
-                        // Update unit fields
-                        unit.setTitle(unitDto.getTitle());
-                        unit.setContent(unitDto.getContent());
-                        
-                        // Check if unit is already associated with this course
-                        boolean alreadyInCourse = currentUnits.stream()
-                                .anyMatch(u -> u.getId().equals(unit.getId()));
-                        
-                        if (!alreadyInCourse) {
-                            // New unit for this course - establish bidirectional relationship
-                            unit.setCourse(existing);
-                            currentUnits.add(unit);
-                        } else {
-                            // Unit already in course, just ensure the relationship is set
-                            unit.setCourse(existing);
-                        }
-                    }
-                }
-            }
-
             Course updated = courseRepository.save(existing);
-            logger.info("Updated course successfully with ID {} including {} units", id, updated.getUnits().size());
+            logger.info("✅ Updated course successfully with ID {}", id);
             return courseMapper.toDto(updated);
 
-        } catch (ResourceNotFoundException ex) {
-            logger.error("Cannot update course, not found ID {}: {}", id, ex.getMessage());
-            throw ex;
+//        } catch (RedisConnectionFailureException e) {
+//            logger.warn("⚠️ Redis unavailable while updating cache for course {}: {}", id, e.getMessage());
+//            Course updated = courseRepository.findById(id)
+//                    .map(courseMapper::toDto)
+//                    .orElseThrow(() -> new ResourceNotFoundException("Course not found after update: " + id));
+//            return updated;
         } catch (Exception ex) {
-            logger.error("Unexpected error while updating course with ID {}", id, ex);
+            logger.error("❌ Unexpected error while updating course with ID {}", id, ex);
             throw ex;
         }
     }
 
+    // ✅ Delete course and evict from cache safely
     @Override
     @CacheEvict(value = "courses", key = "#courseId")
     public void deleteCourse(UUID courseId) {
         try {
-            logger.warn("Deleting course with ID: {}", courseId);
-
+            logger.warn("🗑️ Deleting course with ID: {}", courseId);
             Course course = courseRepository.findById(courseId)
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + courseId));
 
             List<Unit> units = unitRepository.findByCourseId(courseId);
             if (!units.isEmpty()) {
-                for (Unit u : units) {
-                    u.setCourse(null);
-                }
+                units.forEach(u -> u.setCourse(null));
                 unitRepository.saveAllAndFlush(units);
             }
-            course.setUnits(null);
             courseRepository.delete(course);
-
-            logger.info("Course deleted successfully with ID {}", courseId);
-
-        } catch (ResourceNotFoundException ex) {
-            logger.error("Cannot delete course, not found ID {}: {}", courseId, ex.getMessage());
-            throw ex;
+            logger.info("✅ Course deleted successfully with ID {}", courseId);
+        } catch (RedisConnectionFailureException e) {
+            logger.warn("⚠️ Redis unavailable while evicting cache for course {}: {}", courseId, e.getMessage());
         } catch (Exception ex) {
-            logger.error("Unexpected error while deleting course with ID {}", courseId, ex);
+            logger.error("❌ Unexpected error while deleting course {}", courseId, ex);
             throw ex;
         }
     }
-
-
 }
