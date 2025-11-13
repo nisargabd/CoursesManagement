@@ -1064,3 +1064,47 @@
     grid-template-columns: 1fr;
   }
 }
+/* Softer Primary Button */
+.app-btn--primary {
+  background: linear-gradient(90deg, #4f8cd8 0%, #3b79c7 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(63, 106, 168, 0.2) !important;
+
+  &:hover {
+    background: linear-gradient(90deg, #5a98e4 0%, #4a86d4 100%) !important;
+    box-shadow: 0 3px 8px rgba(63, 106, 168, 0.25) !important;
+  }
+}
+
+/* Softer Warn Button */
+.app-btn--warn {
+  background: linear-gradient(90deg, #d45a5a 0%, #c74848 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(180, 50, 50, 0.2) !important;
+
+  &:hover {
+    background: linear-gradient(90deg, #de6a6a 0%, #d15a5a 100%) !important;
+    box-shadow: 0 3px 8px rgba(180, 50, 50, 0.25) !important;
+  }
+}
+
+/* Make icon align nicely after removing brightness */
+.app-btn mat-icon {
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+.add-course-btn {
+  background: linear-gradient(90deg, #4f8cd8 0%, #3b79c7 100%) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 18px;
+  box-shadow: 0 2px 6px rgba(63, 106, 168, 0.2) !important;
+  transition: all 0.25s ease !important;
+}
+
+.add-course-btn:hover {
+  background: linear-gradient(90deg, #5a98e4 0%, #4a86d4 100%) !important;
+  box-shadow: 0 3px 8px rgba(63, 106, 168, 0.25) !important;
+}

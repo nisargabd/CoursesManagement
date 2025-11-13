@@ -11,12 +11,10 @@
   border-color: #000 !important;   /* black border */
   border-width: 2px !important;    /* slightly bold */
 }
-/* Remove the spacing created by the notch (fixes the gap) */
-:host ::ng-deep .mdc-notched-outline__notch {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
+/* Pull the prefix icon LEFT so it sits over the vertical line */
+// :host ::ng-deep .mat-mdc-form-field-icon-prefix {
+//   margin-left: -6px !important;   /* adjust until it hides the line */
+// }
 
 .status-radio-group {
   display: flex;

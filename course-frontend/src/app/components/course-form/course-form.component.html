@@ -169,7 +169,7 @@
           <div class="units-header actions-right">
             <h3>Units</h3>
             <button mat-raised-button type="button" class="app-btn app-btn--primary" (click)="openAddUnitDialog()">
-              <mat-icon>add</mat-icon>
+              <!-- <mat-icon>add</mat-icon> -->
               Add New Unit
             </button>
           </div>
@@ -191,23 +191,26 @@
         </div>
 
       </mat-card-content>
+<mat-card-actions class="actions-right">
 
-      <mat-card-actions class="actions-right">
-        <button mat-button type="button" class="app-btn app-btn--ghost" (click)="onCancel()">
-          <mat-icon>cancel</mat-icon>
-          Cancel
-        </button>
+  <button 
+    mat-button 
+    type="button" 
+    class="app-btn app-btn--ghost" 
+    (click)="onCancel()">
+    Cancel
+  </button>
 
-  
-        <button mat-raised-button
-        class="app-btn app-btn--primary"
-        type="submit"
-        [disabled]="isSubmitting || (!isEditMode && !courseForm.valid)">
-  <mat-icon>{{ isEditMode ? 'update' : 'add' }}</mat-icon>
-  {{ isSubmitting ? 'Saving...' : submitButtonText }}
-</button>
+  <button 
+    mat-raised-button
+    class="app-btn app-btn--primary"
+    type="submit"
+    [disabled]="isSubmitting || (!isEditMode && !courseForm.valid)">
+    {{ isSubmitting ? 'Saving...' : submitButtonText }}
+  </button>
 
-      </mat-card-actions>
+</mat-card-actions>
+
 
 
     </form><!-- Example -->
