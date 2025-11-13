@@ -130,7 +130,7 @@
           </mat-error>
         </mat-form-field>
 <!-- ✅ STATUS (ADMIN ONLY) -->
-<ng-container *ngIf="$any(authService).isAdmin()">
+<!-- <ng-container *ngIf="$any(authService).isAdmin()">
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Status</mat-label>
     <mat-select formControlName="status">
@@ -143,7 +143,26 @@
       Status is required
     </mat-error>
   </mat-form-field>
-</ng-container>
+</ng-container> -->
+<div class="full-width status-radio-group" *ngIf="$any(authService).isAdmin()">
+  <label class="status-title">Status</label>
+
+  <div class="status-options">
+    <label class="radio-label">
+      <input type="radio" value="live" formControlName="status">
+      <span>Live</span>
+    </label>
+    <label class="radio-label">
+      <input type="radio" value="draft" formControlName="status">
+      <span>Draft</span>
+    </label>
+  </div>
+
+  <div class="error-text" *ngIf="courseForm.get('status')?.touched && courseForm.get('status')?.invalid">
+    Status is required
+  </div>
+</div>
+
 
         <!-- ✅ UNITS -->
         <div class="units-section">
@@ -190,6 +209,8 @@
 
       </mat-card-actions>
 
-    </form>
+
+    </form><!-- Example -->
+
   </mat-card>
 </div>

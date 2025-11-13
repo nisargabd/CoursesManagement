@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
+// import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +44,7 @@ public class CourseServiceImpl implements CourseService {
 
     // ✅ Get only live courses
     @Override
+@Cacheable(value = "liveCourses")
     public Page<CourseDto> getLiveCourses(Pageable pageable) {
         return courseRepository.findByStatus("live", pageable)
                 .map(courseMapper::toDto);
@@ -67,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
 
     // ✅ Fetch all courses (PAGINATED) with Redis cache & fallback
     @Override
-@Cacheable(value = "allCourses", key = "#p.pageNumber")
+@Cacheable(value = "allCourses")
 public Page<CourseDto> getAllCourses(Pageable p) {
     try {
         logger.info("🗂 Fetching all courses (checking cache/DB)...");
@@ -84,7 +85,7 @@ public Page<CourseDto> getAllCourses(Pageable p) {
 
     // ✅ Get single course by ID (with Redis fallback)
     @Override
-    @Cacheable(value = "courses", key = "#id")
+    @Cacheable(value = "courses")
     public CourseDto getCourseById(UUID id) {
         try {
             Course course = courseRepository.findById(id)
@@ -101,7 +102,7 @@ public Page<CourseDto> getAllCourses(Pageable p) {
 
     // ✅ Create new course
    @Override
-@CacheEvict(value = {"allCourses", "courses"}, allEntries = true)
+@CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true,beforeInvocation = true)
 public CourseDto createCourse(CourseDto dto) {
     try {
         logger.info("🆕 Creating new course: {}", dto.getName());
@@ -144,7 +145,7 @@ public CourseDto createCourse(CourseDto dto) {
 
     // ✅ Update course & refresh cache
  @Override
-@CacheEvict(value = {"courses", "allCourses"}, allEntries = true)
+@CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true,beforeInvocation = true)
 public CourseDto updateCourse(UUID id, CourseDto dto) {
     try {
         logger.info("✏️ Updating course with ID: {}", id);
@@ -172,7 +173,7 @@ public CourseDto updateCourse(UUID id, CourseDto dto) {
 
     // ✅ Delete course & safely evict cache
     @Override
-@CacheEvict(value = {"courses", "allCourses"}, allEntries = true)
+@CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true)
 public void deleteCourse(UUID courseId) {
     try {
         logger.warn("🗑️ Attempting to delete course with ID: {}", courseId);

@@ -110,6 +110,7 @@ ngOnInit(): void {
     this.loading = false;
     this.loadAvailableUnits();
   }
+   this.courseForm.get('status')?.enable({ emitEvent: false });
 }
 
 setupStepwiseFormValidation(): void {
@@ -209,73 +210,80 @@ setupStepwiseFormValidation(): void {
   }
 
   loadCourseForEdit(): void {
-    if (!this.courseId) {
-      // console.log('No course ID provided');
-      this.loading = false;
-      return;
-    }
-    
-    console.log('Loading course for edit with ID:', this.courseId);
-    
-    this.courseService.getCourseById(this.courseId).subscribe({
-      next: (course) => {
-        console.log('Course loaded successfully:', course);
-        
-        if (!course) {
-          console.error('Course data is null or undefined');
-          this.snackBar.open('Course data not found', 'Close', {
-            duration: 5000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top'
-          });
-          this.loading = false;
-          return;
-        }
-        
-        // Patch form with course data
-        this.courseForm.patchValue({
-          name: course.name || '',
-          description: course.description || '',
-          board: course.board || '',
-          medium: course.medium || [],
-          grade: course.grade || [],
-          subject: course.subject || [],
-          units: course.units || [],
-          status: course.status || 'live'
-        });
-        // ✅ Edit mode: ensure ALL controls are enabled
-      Object.keys(this.courseForm.controls).forEach(key => {
-        this.courseForm.get(key)?.enable({ emitEvent: false });
-      });
+  if (!this.courseId) {
+    this.loading = false;
+    return;
+  }
 
-      this.forceRevalidateForm();
+  console.log('Loading course for edit with ID:', this.courseId);
 
-      // ✅ Force revalidation (important)
-      Object.keys(this.courseForm.controls).forEach(key => {
-        this.courseForm.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      });
-      this.courseForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
-        
-        // Set selected units
-        this.selectedUnits = course.units?.map(unit => unit.id).filter(id => id !== undefined) as string[] || [];
-        
-        console.log('Form patched with values:', this.courseForm.value);
-        this.loading = false;
-        
-        // Load available units after course is loaded
-        this.loadAvailableUnits();
-      },
-      error: (error) => {
-        console.error('Error loading course for edit:', error);
-        this.snackBar.open('Error loading course for editing. Please try again.', 'Close', {
+  this.courseService.getCourseById(this.courseId).subscribe({
+    next: (course) => {
+      console.log('Course loaded successfully:', course);
+
+      if (!course) {
+        console.error('Course data is null or undefined');
+        this.snackBar.open('Course data not found', 'Close', {
           duration: 5000,
           horizontalPosition: 'right',
           verticalPosition: 'top'
         });
         this.loading = false;
+        return;
       }
-    });
-  }
+
+      // ⭐ Normalize backend value properly
+      const normalizedStatus = (course.status || 'live').toLowerCase();
+
+      // ⭐ Patch form
+      this.courseForm.patchValue({
+        name: course.name || '',
+        description: course.description || '',
+        board: course.board || '',
+        medium: course.medium || [],
+        grade: course.grade || [],
+        subject: course.subject || [],
+        units: course.units || [],
+        status: normalizedStatus  // fixed here
+      });
+
+      // ⭐ Ensure ALL controls are enabled in Edit mode
+      Object.keys(this.courseForm.controls).forEach(key => {
+        this.courseForm.get(key)?.enable({ emitEvent: false });
+      });
+
+      // ⭐ Status MUST be enabled separately (to avoid being dropped)
+      this.courseForm.get('status')?.enable({ emitEvent: false });
+
+      // Revalidate entire form
+      this.forceRevalidateForm();
+      Object.keys(this.courseForm.controls).forEach(key => {
+        this.courseForm.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      });
+      this.courseForm.updateValueAndValidity({ emitEvent: false });
+
+      // Units selection
+      this.selectedUnits =
+        course.units?.map(unit => unit.id).filter(id => id !== undefined) as string[] || [];
+
+      console.log('Form patched with values:', this.courseForm.getRawValue());
+      this.loading = false;
+
+      this.loadAvailableUnits();
+    },
+
+    error: (error) => {
+      console.error('Error loading course for edit:', error);
+      this.snackBar.open('Error loading course for editing. Please try again.', 'Close', {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+      this.loading = false;
+    }
+  });
+}
+
 
   loadAvailableUnits(): void {
     console.log('Loading available units...');
@@ -305,7 +313,7 @@ setupStepwiseFormValidation(): void {
   onSubmit(): void {
     if (this.courseForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
-      const formValue = this.courseForm.value;
+      const formValue = this.courseForm.getRawValue();
       
       // Build units array from selectedUnits
       const unitsForCourse = this.selectedUnits.map(unitId => {

@@ -3,6 +3,39 @@
    Clean, Colorful & Clearly Defined Inputs
 ---------------------------------*/
 
+/* --- ADD BLACK BORDER WITHOUT CHANGING ANY HEIGHT / SPACING --- */
+
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading,
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch,
+:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: #000 !important;   /* black border */
+  border-width: 2px !important;    /* slightly bold */
+}
+.status-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-title {
+  font-weight: 600;
+  color: #444;
+  font-size: 15px;
+}
+
+.status-options {
+  display: flex;
+  gap: 20px;
+  padding: 6px 4px;
+}
+
+.error-text {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+
 .course-form-container {
   max-width: 950px;
   margin: 0 auto;
@@ -120,23 +153,8 @@
     }
   }
 }
+/* REQUIRED – disable encapsulation */
 
-/* ---------- COLORFUL ICONS ---------- */
-::ng-deep mat-icon.mat-mdc-form-field-icon {
-  font-size: 20px;
-  margin-right: 8px;
-  opacity: 0.9;
-  transition: color 0.3s ease;
-
-  &[data-icon='book'] { color: #1976d2 !important; }          /* blue */
-  &[data-icon='description'] { color: #7b1fa2 !important; }   /* purple */
-  &[data-icon='account_balance'] { color: #0288d1 !important; } /* cyan */
-  &[data-icon='language'] { color: #00897b !important; }      /* teal */
-  &[data-icon='school'] { color: #f57c00 !important; }        /* orange */
-  &[data-icon='class'] { color: #43a047 !important; }         /* green */
-  &[data-icon='visibility'] { color: #455a64 !important; }    /* gray */
-  &[data-icon='list'] { color: #5e35b1 !important; }          /* deep purple */
-}
 
 /* ---------- UNITS SECTION ---------- */
 .units-section {

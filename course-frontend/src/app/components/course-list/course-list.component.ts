@@ -238,14 +238,16 @@ private handleLoadError() {
     }
     
     this.filteredCourses = this.courses.filter(course => {
-      // Search filter
-      if (this.searchTerm) {
-        const searchLower = this.searchTerm.toLowerCase();
-        const matchesSearch = 
-          course.name.toLowerCase().includes(searchLower) ||
-          course.description.toLowerCase().includes(searchLower);
-        if (!matchesSearch) return false;
-      }
+     // ⭐ NULL-SAFE Search filter (Fix)
+if (this.searchTerm) {
+  const searchLower = this.searchTerm.toLowerCase();
+  const name = (course.name || '').toLowerCase();
+  const desc = (course.description || '').toLowerCase();
+
+  const matchesSearch = name.includes(searchLower) || desc.includes(searchLower);
+  if (!matchesSearch) return false;
+}
+
 
       // Board filter
       if (this.filters.board && course.board !== this.filters.board) {

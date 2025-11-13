@@ -13,25 +13,28 @@ import java.util.stream.Collectors;
 public class CourseMapper {
 
     // Convert Entity → DTO
-    public CourseDto toDto(Course course) {
-        if (course == null) return null;
-        CourseDto dto = new CourseDto();
-        dto.setId(course.getId());
-        dto.setName(course.getName());
-        dto.setDescription(course.getDescription());
-        dto.setBoard(course.getBoard());
-        dto.setMedium(course.getMedium());
-        dto.setGrade(course.getGrade());
-        dto.setSubject(course.getSubject());
+   public CourseDto toDto(Course course) {
+    if (course == null) return null;
+    CourseDto dto = new CourseDto();
+    dto.setId(course.getId());
+    dto.setName(course.getName());
+    dto.setDescription(course.getDescription());
+    dto.setBoard(course.getBoard());
+    dto.setMedium(course.getMedium());
+    dto.setGrade(course.getGrade());
+    dto.setSubject(course.getSubject());
 
-        if (course.getUnits() != null) {
-            dto.setUnits(course.getUnits().stream()
-                    .map(this::toDto)
-                    .collect(Collectors.toList()));
-        }
-
-        return dto;
+    if (course.getUnits() != null) {
+        dto.setUnits(course.getUnits().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList()));
     }
+
+    // ⭐ FIX ADDED
+    dto.setStatus(course.getStatus());
+
+    return dto;
+}
 
     // Convert DTO → Entity
     public Course toEntity(CourseDto dto) {
@@ -51,6 +54,7 @@ public class CourseMapper {
                     .collect(Collectors.toList());
             course.setUnits(units);
         }
+        course.setStatus(dto.getStatus());
 
         return course;
     }
