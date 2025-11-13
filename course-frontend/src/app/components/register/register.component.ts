@@ -80,7 +80,7 @@ export class RegisterComponent {
 
     role: ['', Validators.required]
 });
-  hidePassword!: boolean;
+  hidePassword: boolean = true;
 
   constructor(
     private fb: FormBuilder,

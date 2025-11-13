@@ -31,7 +31,7 @@ export class LoginComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
-hidePassword: any;
+hidePassword: boolean = true;
 
   constructor(
     private fb: FormBuilder,
