@@ -11,6 +11,13 @@
   border-color: #000 !important;   /* black border */
   border-width: 2px !important;    /* slightly bold */
 }
+/* Remove the spacing created by the notch (fixes the gap) */
+:host ::ng-deep .mdc-notched-outline__notch {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+
 .status-radio-group {
   display: flex;
   flex-direction: column;
