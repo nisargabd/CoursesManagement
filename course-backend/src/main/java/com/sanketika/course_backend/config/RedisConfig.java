@@ -2,18 +2,15 @@ package com.sanketika.course_backend.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-// import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-// import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
@@ -35,19 +32,18 @@ public class RedisConfig {
             log.warn("⚠ Redis DOWN. Falling back to in-memory cache.");
         }
 
-        // 2️⃣ If Redis is UP → use RedisCacheManager
         if (redisAvailable) {
             log.info("✅ Using Redis cache manager");
-          RedisCacheConfiguration config = RedisCacheConfiguration
-        .defaultCacheConfig()
-        .entryTtl(Duration.ofMinutes(10))
-        .disableCachingNullValues()
-        .serializeValuesWith(
-            RedisSerializationContext.SerializationPair.fromSerializer(
-                    new GenericJackson2JsonRedisSerializer()
-            )
-        );
 
+            RedisCacheConfiguration config = RedisCacheConfiguration
+                    .defaultCacheConfig()
+                    .entryTtl(Duration.ofMinutes(10))
+                    .disableCachingNullValues()
+                    .serializeValuesWith(
+                            RedisSerializationContext.SerializationPair.fromSerializer(
+                                    new JdkSerializationRedisSerializer()
+                            )
+                    );
 
             return RedisCacheManager
                     .builder(redisConnectionFactory)
@@ -55,7 +51,6 @@ public class RedisConfig {
                     .build();
         }
 
-        // 3️⃣ If Redis DOWN → use in-memory ConcurrentMapCacheManager
         log.warn("⚠ Using fallback in-memory cache (ConcurrentMapCacheManager)");
         return new ConcurrentMapCacheManager(
                 "allCourses",
