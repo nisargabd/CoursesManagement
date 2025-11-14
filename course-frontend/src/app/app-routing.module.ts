@@ -27,6 +27,7 @@ export const routes: Routes = [
       { path: 'edit/:id', component: CourseFormComponent },
       { path: 'add', component: CourseFormComponent },
       { path: 'unit', component: UnitFormComponent }
+      
     ]
   },
   {
@@ -40,6 +41,8 @@ export const routes: Routes = [
   canActivate: [AdminGuard]
 },
 
+{ path: 'admin-dashboard', redirectTo: 'courses', pathMatch: 'full' },
+{ path: 'user-dashboard', redirectTo: 'courses', pathMatch: 'full' },
 
   // ✅ DEFAULT ROUTE
   { path: '', redirectTo: 'courses', pathMatch: 'full' },

@@ -30,7 +30,7 @@ public class CourseMapper {
                 .collect(Collectors.toList()));
     }
 
-    // ⭐ FIX ADDED
+
     dto.setStatus(course.getStatus());
 
     return dto;
