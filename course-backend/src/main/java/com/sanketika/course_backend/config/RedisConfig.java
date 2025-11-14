@@ -2,21 +2,19 @@ package com.sanketika.course_backend.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
-import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
+// import org.springframework.cache.interceptor.SimpleCacheErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnection;
+// import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
 
@@ -29,7 +27,6 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
-        // 1️⃣ Check if Redis is actually reachable (PING)
         boolean redisAvailable = false;
         try {
             redisConnectionFactory.getConnection().ping();
@@ -41,10 +38,16 @@ public class RedisConfig {
         // 2️⃣ If Redis is UP → use RedisCacheManager
         if (redisAvailable) {
             log.info("✅ Using Redis cache manager");
-            RedisCacheConfiguration config = RedisCacheConfiguration
-                    .defaultCacheConfig()
-                    .entryTtl(Duration.ofMinutes(10))
-                    .disableCachingNullValues();
+          RedisCacheConfiguration config = RedisCacheConfiguration
+        .defaultCacheConfig()
+        .entryTtl(Duration.ofMinutes(10))
+        .disableCachingNullValues()
+        .serializeValuesWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(
+                    new GenericJackson2JsonRedisSerializer()
+            )
+        );
+
 
             return RedisCacheManager
                     .builder(redisConnectionFactory)
