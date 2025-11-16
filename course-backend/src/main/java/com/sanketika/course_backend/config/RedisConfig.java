@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+// import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
@@ -24,16 +25,8 @@ public class RedisConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 
-        boolean redisAvailable = false;
-        try {
-            redisConnectionFactory.getConnection().ping();
-            redisAvailable = true;
-        } catch (Exception e) {
-            log.warn("⚠ Redis DOWN. Falling back to in-memory cache.");
-        }
-
-        if (redisAvailable) {
-            log.info("✅ Using Redis cache manager");
+        if (isRedisAvailable(redisConnectionFactory)) {
+            log.info("✅ Redis is UP — using RedisCacheManager");
 
             RedisCacheConfiguration config = RedisCacheConfiguration
                     .defaultCacheConfig()
@@ -45,17 +38,22 @@ public class RedisConfig {
                             )
                     );
 
-            return RedisCacheManager
-                    .builder(redisConnectionFactory)
+            return RedisCacheManager.builder(redisConnectionFactory)
                     .cacheDefaults(config)
                     .build();
         }
 
-        log.warn("⚠ Using fallback in-memory cache (ConcurrentMapCacheManager)");
-        return new ConcurrentMapCacheManager(
-                "allCourses",
-                "liveCourses",
-                "courses"
-        );
+        log.warn("⚠ Redis is DOWN — using in-memory ConcurrentMapCacheManager");
+        return new ConcurrentMapCacheManager("allCourses", "liveCourses", "courses");
+    }
+
+    private boolean isRedisAvailable(RedisConnectionFactory redisConnectionFactory) {
+        try {
+            var connection = redisConnectionFactory.getConnection();
+            connection.getConfig("*"); // simple, fast check
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

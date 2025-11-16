@@ -1,284 +1,149 @@
-/* ------------------------------
-   PROFESSIONAL COURSE FORM (Final)
-   Clean, Colorful & Clearly Defined Inputs
----------------------------------*/
-
-/* --- ADD BLACK BORDER WITHOUT CHANGING ANY HEIGHT / SPACING --- */
-
-:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__leading,
-:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__notch,
-:host ::ng-deep .mat-mdc-form-field .mdc-notched-outline__trailing {
-  border-color: #000 !important;   /* black border */
-  border-width: 2px !important;    /* slightly bold */
-}
-/* Pull the prefix icon LEFT so it sits over the vertical line */
-// :host ::ng-deep .mat-mdc-form-field-icon-prefix {
-//   margin-left: -6px !important;   /* adjust until it hides the line */
-// }
-
-.status-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.status-title {
-  font-weight: 600;
-  color: #444;
-  font-size: 15px;
-}
-
-.status-options {
-  display: flex;
-  gap: 20px;
-  padding: 6px 4px;
-}
-
-.error-text {
-  color: #d32f2f;
-  font-size: 13px;
-  margin-top: 4px;
-}
+/* MAIN WRAPPER */
 
 
-.course-form-container {
-  max-width: 950px;
-  margin: 0 auto;
-  padding: 40px;
-  background: linear-gradient(180deg, #f4f7fb 0%, #edf1f6 100%);
+.course-form-wrapper {
+  max-width: 750px;
+  margin: auto;
+  padding: 32px;
+  background: #f6f8fb;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  font-family: 'Inter', 'Roboto', sans-serif;
 }
 
-/* ---------- HEADER ---------- */
-.form-header {
+/* HEADER */
+.cf-header {
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #ffffff;
-  padding: 20px 28px;
-  border-radius: 12px;
-  border: 1px solid #d6dce5;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
-
-  h1 {
-    margin: 0;
-    font-size: 26px;
-    font-weight: 700;
-    color: #1976d2;
-    letter-spacing: -0.3px;
-  }
+  justify-content: center;
+  margin-bottom: 25px;
+  position: relative;
 }
 
-/* ---------- CARD ---------- */
-.course-form-card {
+/* Left back button */
+.cf-header-left {
+  position: absolute;
+  left: 0;
+}
+
+/* Title centered perfectly */
+.cf-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+}
+
+/* CARD */
+.cf-card {
+  padding: 32px;
   border-radius: 14px;
-  background: #ffffff;
-  border: 1px solid #c9d1dc;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(25, 118, 210, 0.1);
-  }
-
-  mat-card-content {
-    padding: 40px;
-  }
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
 }
 
-/* ---------- FIELDS ---------- */
-.full-width {
-  width: 100%;
+/* SECTION BOX */
+.cf-section {
+  padding: 20px;
+  border: 1px solid #cfd8e6;
+  border-radius: 12px;
+  background: #ffffff;
+  margin-bottom: 30px;
+}
+
+/* FIELD */
+.cf-field {
   margin-bottom: 28px;
 
-  ::ng-deep {
-    .mat-mdc-form-field {
-      background: #f9fbff;
-      border-radius: 10px;
-      border: 2px solid #c2c9d4 !important;
-      padding: 8px 12px;
-      transition: all 0.25s ease;
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+
+    span {
+      color: #d32f2f;
     }
 
-    .mat-mdc-form-field:hover {
-      border-color: #aab5c5 !important;
-      background: #ffffff;
-    }
-
-    .mat-mdc-form-field:focus-within {
-      border-color: #1976d2 !important;
-      box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
-      background: #ffffff;
-    }
-
-    input,
-    textarea,
-    .mat-mdc-select {
-      font-size: 15px !important;
-      color: #222 !important;
-      font-weight: 500;
-      padding: 10px 4px;
-    }
-
-    textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    /* Label */
-    .mat-mdc-form-field-label {
-      color: #444 !important;
-      font-weight: 600 !important;
-      font-size: 14px !important;
-    }
-
-    /* Options */
-    .mat-mdc-option {
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      margin: 2px 6px;
-
-      &:hover {
-        background: #f0f6ff;
-        color: #1976d2;
-      }
-
-      &.mdc-list-item--selected {
-        background: #e3f2fd !important;
-        color: #1976d2 !important;
-        font-weight: 600;
-      }
+    mat-icon {
+      font-size: 20px;
+      color: #1976d2;
     }
   }
 }
-/* REQUIRED – disable encapsulation */
 
+/* FIELD WIDTH */
+.cf-mat-field {
+  width: 100%;
+}
 
-/* ---------- UNITS SECTION ---------- */
-.units-section {
-  margin-top: 40px;
-  background: #f7faff;
-  border: 2px solid #d3dae5;
+/* 🔥 BLACK BORDERS FOR INPUT FIELDS */
+.cf-mat-field .mdc-notched-outline__leading,
+.cf-mat-field .mdc-notched-outline__notch,
+.cf-mat-field .mdc-notched-outline__trailing {
+  border-color: #000 !important;
+  border-width: 2px !important;
+}
+
+.cf-mat-field.mat-focused .mdc-notched-outline__leading,
+.cf-mat-field.mat-focused .mdc-notched-outline__notch,
+.cf-mat-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: #000 !important;
+}
+
+/* UNITS SECTION */
+.cf-units-box {
+  padding: 20px;
+  border: 1px solid #cfd8e6;
   border-radius: 12px;
-  padding: 28px;
-  box-shadow: 0 2px 10px rgba(25, 118, 210, 0.08);
+  background: #f9fbff;
 
-  .units-header {
+  .cf-units-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 18px;
 
-    h3 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 700;
-      color: #1976d2;
+    h2 {
       display: flex;
       align-items: center;
-      gap: 8px;
-
-      &::before {
-        content: "📘";
-        font-size: 20px;
-      }
+      gap: 6px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1976d2;
     }
-
-    button {
-      border-radius: 8px;
-      font-weight: 600;
-      background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
-      color: #fff;
-      padding: 6px 20px;
-      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.25);
-      transition: all 0.25s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 12px rgba(25, 118, 210, 0.3);
-      }
-    }
-  }
-
-  .no-units-message {
-    background: #ffffff;
-    border: 1px solid #e3e7ee;
-    border-radius: 8px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #555;
-    font-weight: 500;
 
     mat-icon {
-      color: #f9a825;
+      font-size: 22px;
+    }
+  }
+
+  .cf-no-units {
+    margin-top: 12px;
+    padding: 14px;
+    display: flex;
+    gap: 8px;
+    border-radius: 8px;
+    border: 1px solid #d8dee9;
+    background: #fff;
+    color: #555;
+
+    mat-icon {
+      color: #fbc02d;
     }
   }
 }
 
-/* ---------- ACTION BUTTONS ---------- */
-mat-card-actions {
-  padding: 20px 40px;
-  background: #fafbfc;
-  border-top: 1px solid #d6dce5;
+/* ACTION BUTTONS */
+.cf-actions {
+  margin-top: 30px;
   display: flex;
   justify-content: flex-end;
-  gap: 16px;
+  gap: 18px;
 
   button {
-    height: 46px;
-    border-radius: 8px;
+    min-width: 120px;
     font-weight: 600;
-    letter-spacing: 0.3px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.25s ease;
-
-    &.app-btn--primary {
-      background: linear-gradient(90deg, #1976d2 0%, #1565c0 100%);
-      color: #fff;
-      box-shadow: 0 3px 10px rgba(25, 118, 210, 0.3);
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
-      }
-    }
-
-    &.app-btn--ghost {
-      background: #f4f5f7;
-      color: #333;
-
-      &:hover {
-        background: #e5e7eb;
-      }
-    }
-  }
-}
-
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 768px) {
-  .course-form-container {
-    padding: 24px 16px;
-  }
-
-  .course-form-card mat-card-content {
-    padding: 24px;
-  }
-
-  mat-card-actions {
-    flex-direction: column;
-    button {
-      width: 100%;
-    }
   }
 }

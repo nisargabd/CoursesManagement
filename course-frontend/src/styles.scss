@@ -1,4 +1,22 @@
-/* Global Styles */
+/* Apply black border ONLY inside course form */
+.course-form-wrapper .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: #000 !important;
+  --mdc-outlined-text-field-hover-outline-color: #000 !important;
+  --mdc-outlined-text-field-focus-outline-color: #000 !important;
+}
+
+/* Increase thickness to match Material’s focus border */
+.course-form-wrapper
+  .mdc-notched-outline__leading,
+.course-form-wrapper
+  .mdc-notched-outline__notch,
+.course-form-wrapper
+  .mdc-notched-outline__trailing {
+  border-width: 2px !important;
+  border-color: #000 !important;
+}
+ 
+
 
 html, body { 
   height: 100%; 
