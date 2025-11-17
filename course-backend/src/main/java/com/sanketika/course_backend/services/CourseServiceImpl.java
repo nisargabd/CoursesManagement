@@ -39,8 +39,8 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseMapper courseMapper;
 
-    @Autowired
-    private AuthService authService;
+    // @Autowired
+    // private AuthService authService;
 
     // ✅ Get only live courses
     @Override
