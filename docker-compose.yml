@@ -15,11 +15,7 @@ services:
     networks:
       - course
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      
 
   redis:
     image: redis:7-alpine
@@ -31,11 +27,8 @@ services:
     networks:
       - course_redis
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+  
+
 
   backend:
     build: 
@@ -51,10 +44,8 @@ services:
     ports:
       - "9099:9099"
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - course
       - course_redis

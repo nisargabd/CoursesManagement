@@ -48,17 +48,13 @@ export class CourseListComponent implements OnInit {
   filteredCourses: Course[] = [];
   searchTerm: string = '';
   filters: CourseFilter = {};
-  
-  // Pagination properties
+ 
   totalElements: number = 0;
   pageSize: number = 6;
   currentPage: number = 0;
   isLoading: boolean = false;
-  
-  // Search mode - if true, load all courses for client-side filtering
   searchMode: boolean = false;
 
-  // Filter options - will be loaded from backend
   boardOptions: string[] = [];
   mediumOptions: string[] = [];
   gradeOptions: string[] = [];
@@ -170,15 +166,17 @@ private handleLoadError() {
   loadCourses(): void {
   this.isLoading = true;
 
-  const isAdmin = this.roleService.isAdmin(); // ✅ Check user role
+  const isAdmin = this.roleService.isAdmin();
 
-  // ✅ If searching or filtering, load full list
+
   if (this.searchMode || this.searchTerm || this.hasActiveFilters()) {
     if (isAdmin) {
-      // ✅ Admin: load ALL courses
-      this.courseService.getAllCoursesSimple().subscribe({
+    
+      this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
         next: (courses) => {
-          this.courses = Array.isArray(courses) ? courses : [];
+          this.courses = courses.content ?? [];
+this.totalElements = courses.totalElements ?? 0;
+
           this.applyFilters();
           this.totalElements = this.filteredCourses.length;
           this.isLoading = false;
@@ -186,8 +184,8 @@ private handleLoadError() {
         error: () => this.handleLoadError()
       });
     } else {
-      // ✅ User: load ONLY live courses
-      this.courseService.getLiveCoursesSimple().subscribe({
+     
+      this.courseService.getLiveCourses(this.currentPage, this.pageSize).subscribe({
         next: (courses) => {
           this.courses = Array.isArray(courses) ? courses : [];
           this.applyFilters();
@@ -200,10 +198,8 @@ private handleLoadError() {
 
     return;
   }
-
-  // ✅ PAGINATION MODE
   if (isAdmin) {
-    // ✅ Admin: paginated ALL courses
+   
     this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.courses = response.content || [];
@@ -214,7 +210,7 @@ private handleLoadError() {
       error: () => this.handleLoadError()
     });
   } else {
-    // ✅ User: paginated LIVE-only courses
+  
     this.courseService.getLiveCourses(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.courses = response.content || [];
@@ -232,13 +228,13 @@ private handleLoadError() {
   }
 
   applyFilters(): void {
-    // Ensure courses is always an array
+  
     if (!Array.isArray(this.courses)) {
       this.courses = [];
     }
     
     this.filteredCourses = this.courses.filter(course => {
-     // ⭐ NULL-SAFE Search filter (Fix)
+     
 if (this.searchTerm) {
   const searchLower = this.searchTerm.toLowerCase();
   const name = (course.name || '').toLowerCase();
@@ -272,7 +268,6 @@ if (this.searchTerm) {
       return true;
     });
 
-    // Keep totals in sync and clamp page index after filtering
     const total = this.filteredCourses.length;
     this.totalElements = total;
     const maxPageIndex = Math.max(0, Math.ceil(total / this.pageSize) - 1);
@@ -283,13 +278,13 @@ if (this.searchTerm) {
 
   onSearchChange(): void {
     this.searchMode = !!this.searchTerm;
-    this.currentPage = 0; // Reset to first page when searching
+    this.currentPage = 0; 
     this.loadCourses();
   }
 
   onFilterChange(): void {
     this.searchMode = this.hasActiveFilters();
-    this.currentPage = 0; // Reset to first page when filtering
+    this.currentPage = 0; 
     this.loadCourses();
   }
 
@@ -311,7 +306,7 @@ if (this.searchTerm) {
 
   onPageSizeChange(newPageSize: number): void {
     this.pageSize = newPageSize;
-    this.currentPage = 0; // Reset to first page when changing page size
+    this.currentPage = 0; 
     if (!this.searchMode) {
       this.loadCourses();
     }
@@ -405,7 +400,7 @@ if (this.searchTerm) {
   }
   onCustomPageSizeChange(): void {
   if (!this.pageSize || this.pageSize < 1) {
-    this.pageSize = 6; // default fallback
+    this.pageSize = 6;
   }
 
   this.currentPage = 0;
@@ -416,7 +411,6 @@ if (this.searchTerm) {
 }
 
 
-  // Returns the list of courses to display on the current page
   getDisplayedCourses(): Course[] {
     if (this.searchMode) {
       const start = this.currentPage * this.pageSize;
@@ -480,9 +474,8 @@ if (this.searchTerm) {
   }
 
   getRandomCourseImage(course: Course): string {
-    // Generate a consistent design pattern based on course name
     const seed = this.hashCode(course.name + course.id);
-    const designIndex = Math.abs(seed) % 12; // 12 different design patterns
+    const designIndex = Math.abs(seed) % 12; 
     return this.getDesignPattern(designIndex);
   }
 
@@ -510,7 +503,7 @@ if (this.searchTerm) {
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
+      hash = hash & hash; 
     }
     return hash;
   }

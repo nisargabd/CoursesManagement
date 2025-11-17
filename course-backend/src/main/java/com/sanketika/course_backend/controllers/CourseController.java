@@ -27,8 +27,8 @@ public class CourseController {
     @Autowired
     private CourseService courseService;
 
-    // ✅ Get ONLY live courses (for users)
-    @GetMapping("/public")
+
+    @GetMapping("/get/live")
     public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getLiveCourses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
@@ -47,7 +47,6 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Get ALL courses (for admin)
     @GetMapping("/get")
     public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getAllCourses(
             @RequestParam(defaultValue = "0") int page,
@@ -67,7 +66,6 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Get course by ID
     @GetMapping("/get/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> getCourseById(@PathVariable UUID id) {
         logger.info("📘 Fetching course with ID: {}", id);
@@ -84,7 +82,6 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Create course (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiEnvelope<CourseDto>> createCourse(@Valid @RequestBody CourseDto dto) {
@@ -102,7 +99,7 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Update course (Admin only)
+   
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ApiEnvelope<CourseDto>> updateCourse(
@@ -123,7 +120,6 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Delete course (Admin only)
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ApiEnvelope<Void>> deleteCourse(@PathVariable UUID id) {

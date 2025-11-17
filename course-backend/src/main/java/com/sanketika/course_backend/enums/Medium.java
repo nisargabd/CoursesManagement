@@ -1,8 +1,5 @@
 package com.sanketika.course_backend.enums;
 
-/**
- * Enum for medium of instruction
- */
 public enum Medium {
     ENGLISH("English"),
     HINDI("Hindi"),

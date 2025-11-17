@@ -41,14 +41,15 @@ public class Course {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    // Cascade persist and merge to save/update units with course
-    // orphanRemoval = false means units won't be deleted, just disconnected
     @OneToMany(mappedBy = "course", cascade = {CascadeType.ALL}, orphanRemoval = false, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Unit> units = new ArrayList<>();
 
     @Column(nullable = false)
     private String status = "live";
+
+    @Column(name = "deleted", nullable = false)
+private boolean deleted = false;
 
     public Course(){
     }

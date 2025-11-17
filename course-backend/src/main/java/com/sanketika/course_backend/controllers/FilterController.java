@@ -2,79 +2,90 @@ package com.sanketika.course_backend.controllers;
 
 import com.sanketika.course_backend.dto.FilterOptionsDto;
 import com.sanketika.course_backend.dto.FilterRequestDto;
-import com.sanketika.course_backend.services.CourseServiceImpl;
-import com.sanketika.course_backend.services.FilterOptionsService;
+import com.sanketika.course_backend.enums.Board;
+import com.sanketika.course_backend.enums.Grade;
+import com.sanketika.course_backend.enums.Medium;
+import com.sanketika.course_backend.enums.Subject;
+import com.sanketika.course_backend.repositories.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
-/**
- * Controller for filter options
- */
 @RestController
 @CrossOrigin(origins = {"http://localhost:4800", "http://localhost:4200"})
 @RequestMapping("/api/filters")
 public class FilterController {
 
     @Autowired
-    private FilterOptionsService filterOptionsService;
+    private CourseRepository courseRepository;
 
-    @Autowired
-    private CourseServiceImpl courseService;
+    @GetMapping("/boards")
+    public ResponseEntity<List<String>> getBoards() {
+        return ResponseEntity.ok(
+                courseRepository.findDistinctBoards()
+        );
+    }
 
     @PostMapping("/mediums")
     public ResponseEntity<List<String>> getMediumsByBoard(@RequestBody FilterRequestDto request) {
-        return ResponseEntity.ok(courseService.getMediumsByBoard(request.getBoard()));
+        return ResponseEntity.ok(
+                courseRepository.findDistinctMediumByBoard(request.getBoard())
+        );
     }
 
     @PostMapping("/grades")
-    public ResponseEntity<List<String>> getGradesByBoardAndMedium(@RequestBody FilterRequestDto request) {
-        return ResponseEntity.ok(courseService.getGradesByBoardAndMedium(request.getBoard(), request.getMedium()));
+    public ResponseEntity<List<String>> getGrades(@RequestBody FilterRequestDto request) {
+        return ResponseEntity.ok(
+                courseRepository.findDistinctGradeByBoardAndMediums(
+                        request.getBoard(),
+                        request.getMedium()
+                )
+        );
     }
 
-     @PostMapping("/subjects")
-    public ResponseEntity<List<String>> getSubjectsByBoardMediumAndGrade(@RequestBody FilterRequestDto request) {
-        return ResponseEntity.ok(courseService.getSubjectsByBoardMediumAndGrade(
-                request.getBoard(),
-                request.getMedium(),
-                request.getGrade()
-        ));
+    @PostMapping("/subjects")
+    public ResponseEntity<List<String>> getSubjects(@RequestBody FilterRequestDto request) {
+        return ResponseEntity.ok(
+                courseRepository.findDistinctSubjectsByBoardMediumsAndGrades(
+                        request.getBoard(),
+                        request.getMedium(),
+                        request.getGrade()
+                )
+        );
     }
 
-   @GetMapping("/boards")
-   public ResponseEntity<List<String>> getBoards() {
-       return ResponseEntity.ok(courseService.getAllBoards());
-   }
-//
-//    @GetMapping("/mediums")
-//    public ResponseEntity<List<String>> getMediumsByBoard(@RequestBody String board) {
-//        return ResponseEntity.ok(courseService.getMediumsByBoard(board));
-//    }
-//
-//    @GetMapping("/grades")
-//    public ResponseEntity<List<String>> getGradesByBoardAndMedium(
-//            @RequestBody String board,
-//            @RequestBody String medium) {
-//        return ResponseEntity.ok(courseService.getGradesByBoardAndMedium(board, medium));
-//    }
-//
-//    @GetMapping("/subjects")
-//    public ResponseEntity<List<String>> getSubjectsByBoardMediumAndGrade(
-//            @RequestBody String board,
-//            @RequestBody String medium,
-//            @RequestBody String grade) {
-//        return ResponseEntity.ok(courseService.getSubjectsByBoardMediumAndGrade(board, medium, grade));
-//    }
+  @GetMapping("/options")
+public ResponseEntity<FilterOptionsDto> getFilterOptions() {
 
-    /**
-     * Get all available filter options
-     * @return FilterOptionsDto containing boards, mediums, grades, and subjects
-     */
-    @GetMapping("/options")
-    public ResponseEntity<FilterOptionsDto> getFilterOptions() {
-        FilterOptionsDto options = filterOptionsService.getFilterOptions();
-        return ResponseEntity.ok(options);
-    }
+    // Load all values directly from enums
+    List<String> boards = Arrays.stream(Board.values())
+            .map(Board::getDisplayName)
+            .toList();
+
+    List<String> mediums = Arrays.stream(Medium.values())
+            .map(Medium::getDisplayName)
+            .toList();
+
+    List<String> grades = Arrays.stream(Grade.values())
+            .map(Grade::getDisplayName)
+            .toList();
+
+    List<String> subjects = Arrays.stream(Subject.values())
+            .map(Subject::getDisplayName)
+            .toList();
+
+    FilterOptionsDto dto = new FilterOptionsDto(
+            boards,
+            mediums,
+            grades,
+            subjects
+    );
+
+    return ResponseEntity.ok(dto);
+}
+
+
 }
