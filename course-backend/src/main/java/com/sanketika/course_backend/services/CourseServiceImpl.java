@@ -39,10 +39,6 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseMapper courseMapper;
 
-    // @Autowired
-    // private AuthService authService;
-
-    // ✅ Get only live courses
     @Override
 @Cacheable(value = "liveCourses")
     public Page<CourseDto> getLiveCourses(Pageable pageable) {
@@ -66,7 +62,7 @@ public class CourseServiceImpl implements CourseService {
         return courseRepository.findDistinctSubjectsByBoardMediumsAndGrades(board, mediums, grades);
     }
 
-    // ✅ Fetch all courses (PAGINATED) with Redis cache & fallback
+ 
     @Override
 @Cacheable(value = "allCourses")
 public Page<CourseDto> getAllCourses(Pageable p) {
@@ -83,7 +79,7 @@ public Page<CourseDto> getAllCourses(Pageable p) {
 }
 
 
-    // ✅ Get single course by ID (with Redis fallback)
+   
     @Override
     @Cacheable(value = "courses")
     public CourseDto getCourseById(UUID id) {
@@ -100,8 +96,7 @@ public Page<CourseDto> getAllCourses(Pageable p) {
         }
     }
 
-    // ✅ Create new course
-   @Override
+ @Override
 @CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true,beforeInvocation = true)
 public CourseDto createCourse(CourseDto dto) {
     try {
@@ -141,9 +136,6 @@ public CourseDto createCourse(CourseDto dto) {
 }
 
 
-
-
-    // ✅ Update course & refresh cache
  @Override
 @CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true,beforeInvocation = true)
 public CourseDto updateCourse(UUID id, CourseDto dto) {
@@ -171,7 +163,6 @@ public CourseDto updateCourse(UUID id, CourseDto dto) {
     }
 }
 
-    // ✅ Delete course & safely evict cache
     @Override
 @CacheEvict(value = {"allCourses", "courses", "liveCourses"}, allEntries = true)
 public void deleteCourse(UUID courseId) {
@@ -181,7 +172,7 @@ public void deleteCourse(UUID courseId) {
         // ✅ Check if course exists
         if (!courseRepository.existsById(courseId)) {
             logger.warn("⚠️ Course with ID {} not found. Skipping deletion.", courseId);
-            return; // Do not throw exception — make it idempotent
+            return; 
         }
 
         Course course = courseRepository.findById(courseId)
@@ -194,11 +185,8 @@ public void deleteCourse(UUID courseId) {
             unitRepository.saveAllAndFlush(units);
             unitRepository.deleteAll(units);
         }
-
-        // ✅ Delete the course
         courseRepository.delete(course);
 
-        // ✅ Log and cache cleanup
         logger.info("✅ Course deleted successfully with ID {}", courseId);
 
     } catch (RedisConnectionFailureException e) {

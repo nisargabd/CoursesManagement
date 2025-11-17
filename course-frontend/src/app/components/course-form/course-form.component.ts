@@ -244,18 +244,15 @@ setupStepwiseFormValidation(): void {
         grade: course.grade || [],
         subject: course.subject || [],
         units: course.units || [],
-        status: normalizedStatus  // fixed here
+        status: normalizedStatus  
       });
 
-      // ⭐ Ensure ALL controls are enabled in Edit mode
       Object.keys(this.courseForm.controls).forEach(key => {
         this.courseForm.get(key)?.enable({ emitEvent: false });
       });
 
-      // ⭐ Status MUST be enabled separately (to avoid being dropped)
       this.courseForm.get('status')?.enable({ emitEvent: false });
 
-      // Revalidate entire form
       this.forceRevalidateForm();
       Object.keys(this.courseForm.controls).forEach(key => {
         this.courseForm.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
@@ -288,7 +285,6 @@ setupStepwiseFormValidation(): void {
   loadAvailableUnits(): void {
     console.log('Loading available units...');
     if (!this.courseId) {
-      // In create mode, do not show global units; units are scoped per course
       this.availableUnits = [];
       return;
     }
@@ -474,7 +470,7 @@ setupStepwiseFormValidation(): void {
  openAddUnitDialog(): void {
   const dialogRef = this.dialog.open(AddUnitDialogComponent, {
     width: '500px',
-    data: { courseId: this.courseId } // null is OK for add mode
+    data: { courseId: this.courseId } 
   });
 
   dialogRef.afterClosed().subscribe(result => {
@@ -495,7 +491,6 @@ setupStepwiseFormValidation(): void {
 }
 
 
-  // Open confirm dialog and remove unit on confirm
   confirmRemoveUnit(unitId: string): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
@@ -514,7 +509,7 @@ setupStepwiseFormValidation(): void {
     });
   }
 
-  // Button handler to prevent overlapping clicks and open dialog
+  
   onDeleteUnitClick(event: Event, unitId: string): void {
     event.preventDefault();
     event.stopPropagation();

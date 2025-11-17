@@ -50,7 +50,7 @@ public class RedisConfig {
     private boolean isRedisAvailable(RedisConnectionFactory redisConnectionFactory) {
         try {
             var connection = redisConnectionFactory.getConnection();
-            connection.getConfig("*"); // simple, fast check
+            connection.getConfig("*");
             return true;
         } catch (Exception e) {
             return false;
