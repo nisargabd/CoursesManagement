@@ -172,7 +172,7 @@ private handleLoadError() {
   if (this.searchMode || this.searchTerm || this.hasActiveFilters()) {
     if (isAdmin) {
     
-      this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
+      this.courseService.getAllCourses(this.currentPage, this.pageSize,this.searchTerm).subscribe({
         next: (courses) => {
           this.courses = courses.content ?? [];
 this.totalElements = courses.totalElements ?? 0;

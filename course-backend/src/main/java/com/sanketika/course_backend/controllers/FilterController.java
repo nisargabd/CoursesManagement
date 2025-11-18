@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4800", "http://localhost:4200"})
 @RequestMapping("/api/filters")
 public class FilterController {
 

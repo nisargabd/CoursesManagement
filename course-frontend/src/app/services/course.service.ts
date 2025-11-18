@@ -45,11 +45,22 @@ export class CourseService {
 
     return data;
   }
-getAllCourses(currentPage: number, pageSize: number, options?: { simple?: boolean }): Observable<any> {
+getAllCourses(
+  currentPage: number,
+  pageSize: number,
+  text?: string,
+  options?: { simple?: boolean }
+): Observable<any> {
   const simple = options?.simple ?? false;
 
+  let url = `${this.baseUrl}/get?page=${currentPage}&size=${pageSize}`;
+
+  if (text && text.trim().length > 0) {
+    url += `&text=${encodeURIComponent(text)}`;
+  }
+
   return this.http
-    .get<ApiEnvelope<any>>(`${this.baseUrl}/get?page=${currentPage}&size=${pageSize}`)
+    .get<ApiEnvelope<any>>(url)
     .pipe(
       map(res => this.normalize(res.result.data, simple)),
       catchError(this.handleError)
