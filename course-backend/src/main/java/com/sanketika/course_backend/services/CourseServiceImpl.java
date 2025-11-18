@@ -40,7 +40,7 @@ public class CourseServiceImpl implements CourseService {
     private CourseMapper courseMapper;
 
     @Override
-    @Cacheable(value = "course", key = "'live'")
+    @Cacheable(value = "courses", key = "'live'")
     public List<CourseDto> getLiveCourses() {
         return courseRepository.findByStatus("live")
                 .stream()
@@ -49,7 +49,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "course", key = "'all'")
+    @Cacheable(value = "courses", key = "'all'")
     public List<CourseDto> getAllCourses() {
         return courseRepository.findActiveCourses()
                 .stream()
@@ -58,7 +58,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "course", key = "#id")
+    @Cacheable(value = "courses", key = "#id")
     public CourseDto getCourseById(UUID id) {
 
         Course course = courseRepository.findById(id)
@@ -68,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @CacheEvict(value = "course", allEntries = true)
+    @CacheEvict(value = "courses", allEntries = true)
     public CourseDto createCourse(CourseDto dto) {
         Course course = new Course();
         course.setName(dto.getName());
@@ -98,7 +98,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @CacheEvict(value = "course", allEntries = true)
+    @CacheEvict(value = "courses", allEntries = true)
     public CourseDto updateCourse(UUID id, CourseDto dto) {
         Course existing = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
@@ -117,7 +117,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @CacheEvict(value = "course", allEntries = true)
+    @CacheEvict(value = "courses", allEntries = true)
     public void deleteCourse(UUID courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + courseId));

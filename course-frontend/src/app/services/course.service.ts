@@ -29,11 +29,11 @@ export class CourseService {
   constructor(private http: HttpClient) {}
 
   private normalize(data: any, simple: boolean) {
-    if (simple) {
-      return Array.isArray(data) ? data : data?.content || [];
-    }
+
 
     if (Array.isArray(data)) {
+      if (simple) return data;
+
       return {
         content: data,
         totalElements: data.length,
@@ -43,58 +43,68 @@ export class CourseService {
       };
     }
 
-    return data;
-  }
-getAllCourses(
-  currentPage: number,
-  pageSize: number,
-  text?: string,
-  options?: { simple?: boolean }
-): Observable<any> {
-  const simple = options?.simple ?? false;
+    if (data && data.content) {
+      return data;
+    }
 
-  let url = `${this.baseUrl}/get?page=${currentPage}&size=${pageSize}`;
-
-  if (text && text.trim().length > 0) {
-    url += `&text=${encodeURIComponent(text)}`;
+    return {
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      size: 0,
+      number: 0
+    };
   }
 
-  return this.http
-    .get<ApiEnvelope<any>>(url)
-    .pipe(
-      map(res => this.normalize(res.result.data, simple)),
-      catchError(this.handleError)
-    );
-}
-getLiveCourses(
-  currentPage: number,
-  pageSize: number,
-  text?: string,
-  options?: { simple?: boolean }
-): Observable<any> {
+  getAllCourses(
+    currentPage: number,
+    pageSize: number,
+    text?: string,
+    options?: { simple?: boolean }
+  ): Observable<any> {
 
-  const simple = options?.simple ?? false;
+    const simple = options?.simple ?? false;
 
-  let url = `${this.baseUrl}/get/live?page=${currentPage}&size=${pageSize}`;
+    let url = `${this.baseUrl}/get?page=${currentPage}&size=${pageSize}`;
+    if (text && text.trim().length > 0) {
+      url += `&text=${encodeURIComponent(text)}`;
+    }
 
-  // include search text only if it exists
-  if (text && text.trim().length > 0) {
-    url += `&text=${encodeURIComponent(text)}`;
+    return this.http
+      .get<ApiEnvelope<any>>(url)
+      .pipe(
+        map(res => this.normalize(res.result?.data, simple)),
+        catchError(this.handleError)
+      );
   }
 
-  return this.http
-    .get<ApiEnvelope<any>>(url)
-    .pipe(
-      map(res => this.normalize(res.result.data, simple)),
-      catchError(this.handleError)
-    );
-}
+  getLiveCourses(
+    currentPage: number,
+    pageSize: number,
+    text?: string,
+    options?: { simple?: boolean }
+  ): Observable<any> {
+
+    const simple = options?.simple ?? false;
+
+    let url = `${this.baseUrl}/get/live?page=${currentPage}&size=${pageSize}`;
+    if (text && text.trim().length > 0) {
+      url += `&text=${encodeURIComponent(text)}`;
+    }
+
+    return this.http
+      .get<ApiEnvelope<any>>(url)
+      .pipe(
+        map(res => this.normalize(res.result?.data, simple)),
+        catchError(this.handleError)
+      );
+  }
 
   getCourseById(id: string): Observable<Course> {
     return this.http
       .get<ApiEnvelope<Course>>(`${this.baseUrl}/get/${id}`)
       .pipe(
-        map(res => res.result.data),
+        map(res => res.result?.data),
         catchError(this.handleError)
       );
   }
@@ -103,7 +113,7 @@ getLiveCourses(
     return this.http
       .post<ApiEnvelope<Course>>(`${this.baseUrl}/add`, course)
       .pipe(
-        map(res => res.result.data),
+        map(res => res.result?.data),
         catchError(this.handleError)
       );
   }
@@ -112,7 +122,7 @@ getLiveCourses(
     return this.http
       .put<ApiEnvelope<Course>>(`${this.baseUrl}/update/${id}`, course)
       .pipe(
-        map(res => res.result.data),
+        map(res => res.result?.data),
         catchError(this.handleError)
       );
   }
