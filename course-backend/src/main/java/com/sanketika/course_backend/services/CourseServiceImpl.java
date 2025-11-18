@@ -57,15 +57,16 @@ public class CourseServiceImpl implements CourseService {
                 .toList();
     }
 
-    @Override
-    @Cacheable(value = "courses", key = "#id")
-    public CourseDto getCourseById(UUID id) {
+@Override
+@Cacheable(value = "courses", key = "#id")
+public Object getCourseById(UUID id) {
+    return courseMapper.toDto(
+        courseRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Course not found"))
+    );
+}
 
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
 
-        return courseMapper.toDto(course);
-    }
 
     @Override
     @CacheEvict(value = "courses", allEntries = true)

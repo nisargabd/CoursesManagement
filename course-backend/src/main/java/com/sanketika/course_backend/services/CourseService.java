@@ -10,7 +10,7 @@ public interface CourseService {
     List<CourseDto> getLiveCourses();   
     List<CourseDto> getAllCourses();       
 
-    CourseDto getCourseById(UUID id);
+    Object getCourseById(UUID id);
 
     CourseDto createCourse(CourseDto dto);
 

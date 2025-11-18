@@ -1,5 +1,6 @@
 package com.sanketika.course_backend.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanketika.course_backend.dto.CourseDto;
 import com.sanketika.course_backend.mapper.ResponseMapper;
 import com.sanketika.course_backend.services.CourseService;
@@ -33,6 +34,9 @@ public class CourseController {
     @Autowired
     private HttpServletRequest request;
 
+    @Autowired
+    private ObjectMapper redisObjectMapper; 
+
     private String autoId() {
         String path = request.getServletPath();
         return path.replace("/", ".").substring(1);
@@ -46,16 +50,20 @@ public class CourseController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        
-        List<CourseDto> allLiveCourses = courseService.getLiveCourses();
+        List<?> raw = courseService.getLiveCourses();
 
-      
+        List<CourseDto> allLiveCourses = redisObjectMapper.convertValue(
+                raw,
+                redisObjectMapper.getTypeFactory().constructCollectionType(List.class, CourseDto.class)
+        );
+
+        // FILTERING
         List<CourseDto> filtered = (text == null || text.isBlank())
                 ? allLiveCourses
                 : allLiveCourses.stream()
-                    .filter(c -> (c.getName() != null && c.getName().toLowerCase().contains(text.toLowerCase())) ||
-                                 (c.getDescription() != null && c.getDescription().toLowerCase().contains(text.toLowerCase())))
-                    .toList();
+                .filter(c -> (c.getName() != null && c.getName().toLowerCase().contains(text.toLowerCase())) ||
+                             (c.getDescription() != null && c.getDescription().toLowerCase().contains(text.toLowerCase())))
+                .toList();
 
         int start = Math.min(page * size, filtered.size());
         int end = Math.min(start + size, filtered.size());
@@ -75,15 +83,22 @@ public class CourseController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        List<CourseDto> allCourses = courseService.getAllCourses();
+        // Fetch raw cached list
+        List<?> raw = courseService.getAllCourses();
 
-   
+        // Deep conversion
+        List<CourseDto> allCourses = redisObjectMapper.convertValue(
+                raw,
+                redisObjectMapper.getTypeFactory().constructCollectionType(List.class, CourseDto.class)
+        );
+
+        // FILTERING
         List<CourseDto> filtered = (text == null || text.isBlank())
                 ? allCourses
                 : allCourses.stream()
-                    .filter(c -> (c.getName() != null && c.getName().toLowerCase().contains(text.toLowerCase())) ||
-                                 (c.getDescription() != null && c.getDescription().toLowerCase().contains(text.toLowerCase())))
-                    .toList();
+                .filter(c -> (c.getName() != null && c.getName().toLowerCase().contains(text.toLowerCase())) ||
+                             (c.getDescription() != null && c.getDescription().toLowerCase().contains(text.toLowerCase())))
+                .toList();
 
         int start = Math.min(page * size, filtered.size());
         int end = Math.min(start + size, filtered.size());
@@ -96,12 +111,19 @@ public class CourseController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<ApiEnvelope<CourseDto>> getCourseById(@PathVariable UUID id) {
-        CourseDto course = courseService.getCourseById(id);
-        return ResponseEntity.ok(
-                ResponseMapper.success(autoId(), "Course fetched successfully", course)
-        );
-    }
+public ResponseEntity<ApiEnvelope<CourseDto>> getCourseById(@PathVariable UUID id) {
+
+    Object raw = courseService.getCourseById(id);
+    CourseDto course = redisObjectMapper.convertValue(
+            raw,
+            CourseDto.class
+    );
+
+    return ResponseEntity.ok(
+            ResponseMapper.success(autoId(), "Course fetched successfully", course)
+    );
+}
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
