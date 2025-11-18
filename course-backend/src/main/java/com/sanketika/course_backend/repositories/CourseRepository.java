@@ -1,12 +1,9 @@
 package com.sanketika.course_backend.repositories;
 
 import com.sanketika.course_backend.entity.Course;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,22 +13,18 @@ import java.util.UUID;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID>, JpaSpecificationExecutor<Course> {
 
-    Page<Course> findByStatus(String status, Pageable pageable);
-
-    Page<Course> findByDeletedFalse(Pageable pageable);
+    List<Course> findByStatus(String status);
 
     @Query("SELECT c FROM Course c WHERE c.deleted = false ORDER BY c.createdAt DESC")
-Page<Course> findActiveCourses(Pageable pageable);
+    List<Course> findActiveCourses();
 
-
-    
     Optional<Course> findById(UUID id);
 
     @Query("SELECT DISTINCT c.board from Course c")
     List<String> findDistinctBoards();
 
     @Query("Select distinct c.medium from Course c where c.board=:board")
-    List<String> findDistinctMediumByBoard(@Param("board") String board);
+    List<String> findDistinctMediumByBoard(String board);
 
     @Query(
         value = "SELECT DISTINCT grade FROM courses " +
@@ -39,10 +32,7 @@ Page<Course> findActiveCourses(Pageable pageable);
                 "AND exists (select 1 from jsonb_array_elements_text(medium::jsonb) as m where m IN (:mediums))",
         nativeQuery = true
     )
-    List<String> findDistinctGradeByBoardAndMediums(
-            @Param("board") String board,
-            @Param("mediums") List<String> mediums
-    );
+    List<String> findDistinctGradeByBoardAndMediums(String board, List<String> mediums);
 
     @Query(
         value = "SELECT DISTINCT subject " +
@@ -53,9 +43,9 @@ Page<Course> findActiveCourses(Pageable pageable);
         nativeQuery = true
     )
     List<String> findDistinctSubjectsByBoardMediumsAndGrades(
-            @Param("board") String board,
-            @Param("mediums") List<String> mediums,
-            @Param("grades") List<String> grades
+            String board,
+            List<String> mediums,
+            List<String> grades
     );
 
     @Query("SELECT DISTINCT c.medium FROM Course c")
@@ -66,5 +56,4 @@ Page<Course> findActiveCourses(Pageable pageable);
 
     @Query("SELECT DISTINCT c.subject FROM Course c")
     List<String> findDistinctSubjects();
-
 }

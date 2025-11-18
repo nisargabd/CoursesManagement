@@ -66,12 +66,24 @@ getAllCourses(
       catchError(this.handleError)
     );
 }
+getLiveCourses(
+  currentPage: number,
+  pageSize: number,
+  text?: string,
+  options?: { simple?: boolean }
+): Observable<any> {
 
-getLiveCourses(currentPage: number, pageSize: number, options?: { simple?: boolean }): Observable<any> {
   const simple = options?.simple ?? false;
 
+  let url = `${this.baseUrl}/get/live?page=${currentPage}&size=${pageSize}`;
+
+  // include search text only if it exists
+  if (text && text.trim().length > 0) {
+    url += `&text=${encodeURIComponent(text)}`;
+  }
+
   return this.http
-    .get<ApiEnvelope<any>>(`${this.baseUrl}/get/live?page=${currentPage}&size=${pageSize}`)
+    .get<ApiEnvelope<any>>(url)
     .pipe(
       map(res => this.normalize(res.result.data, simple)),
       catchError(this.handleError)

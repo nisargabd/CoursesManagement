@@ -35,10 +35,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
+           
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         http.exceptionHandling(ex -> ex
-                .authenticationEntryPoint(authenticationEntryPoint)  // for 401
-                .accessDeniedHandler(accessDeniedHandler)            // for 403
+                .authenticationEntryPoint(authenticationEntryPoint)  
+                .accessDeniedHandler(accessDeniedHandler)            
         );
 
         http.authorizeHttpRequests(auth -> auth

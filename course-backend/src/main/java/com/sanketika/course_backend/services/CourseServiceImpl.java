@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -42,26 +40,21 @@ public class CourseServiceImpl implements CourseService {
     private CourseMapper courseMapper;
 
     @Override
-    @Cacheable(
-    value = "course",
-    key = "'live:' + #pageable.pageNumber + ':' + #pageable.pageSize"
-)
-    public Page<CourseDto> getLiveCourses(Pageable pageable) {
-        return courseRepository
-                .findByStatus("live", pageable)
-                .map(courseMapper::toDto);
+    @Cacheable(value = "course", key = "'live'")
+    public List<CourseDto> getLiveCourses() {
+        return courseRepository.findByStatus("live")
+                .stream()
+                .map(courseMapper::toDto)
+                .toList();
     }
 
     @Override
-   @Cacheable(
-    value = "course",
-    key = "'all:' + #pageable.pageNumber + ':' + #pageable.pageSize"
-)
-    public Page<CourseDto> getAllCourses(Pageable pageable) {
-        logger.info("Fetching all non-deleted courses...");
-        return courseRepository
-                .findActiveCourses(pageable)
-                .map(courseMapper::toDto);
+    @Cacheable(value = "course", key = "'all'")
+    public List<CourseDto> getAllCourses() {
+        return courseRepository.findActiveCourses()
+                .stream()
+                .map(courseMapper::toDto)
+                .toList();
     }
 
     @Override
@@ -71,15 +64,12 @@ public class CourseServiceImpl implements CourseService {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
 
-        logger.info("Fetched course (not deleted) ID {}", id);
         return courseMapper.toDto(course);
     }
 
     @Override
-    @CacheEvict(value = "course", allEntries = true) 
+    @CacheEvict(value = "course", allEntries = true)
     public CourseDto createCourse(CourseDto dto) {
-        logger.info("Creating new course: {}", dto.getName());
-
         Course course = new Course();
         course.setName(dto.getName());
         course.setDescription(dto.getDescription());
@@ -106,11 +96,10 @@ public class CourseServiceImpl implements CourseService {
 
         return courseMapper.toDto(savedCourse);
     }
-    @Override
-    @CacheEvict(value = "course", allEntries = true) 
-    public CourseDto updateCourse(UUID id, CourseDto dto) {
-        logger.info("Updating course ID {}", id);
 
+    @Override
+    @CacheEvict(value = "course", allEntries = true)
+    public CourseDto updateCourse(UUID id, CourseDto dto) {
         Course existing = courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + id));
 
@@ -128,17 +117,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @CacheEvict(value = "course", allEntries = true)  
+    @CacheEvict(value = "course", allEntries = true)
     public void deleteCourse(UUID courseId) {
-        logger.warn("Soft deleting course ID: {}", courseId);
-
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found with ID: " + courseId));
 
         course.setDeleted(true);
         courseRepository.save(course);
-
-        logger.info("Soft deleted course: {}", courseId);
     }
-
 }

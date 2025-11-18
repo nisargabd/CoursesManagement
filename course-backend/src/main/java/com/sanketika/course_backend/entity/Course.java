@@ -49,7 +49,7 @@ public class Course {
     private String status = "live";
 
     @Column(name = "deleted", nullable = false)
-private boolean deleted = false;
+    private boolean deleted = false;
 
     public Course(){
     }

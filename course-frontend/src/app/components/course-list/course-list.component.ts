@@ -185,7 +185,7 @@ this.totalElements = courses.totalElements ?? 0;
       });
     } else {
      
-      this.courseService.getLiveCourses(this.currentPage, this.pageSize).subscribe({
+      this.courseService.getLiveCourses(this.currentPage, this.pageSize,this.searchTerm).subscribe({
         next: (courses) => {
           this.courses = Array.isArray(courses) ? courses : [];
           this.applyFilters();
@@ -211,7 +211,7 @@ this.totalElements = courses.totalElements ?? 0;
     });
   } else {
   
-    this.courseService.getLiveCourses(this.currentPage, this.pageSize).subscribe({
+    this.courseService.getLiveCourses(this.currentPage, this.pageSize,this.searchTerm).subscribe({
       next: (response) => {
         this.courses = response.content || [];
         this.filteredCourses = [...this.courses];
