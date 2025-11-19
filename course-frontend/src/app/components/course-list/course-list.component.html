@@ -135,9 +135,7 @@
             </div>
           </mat-card-content>
           
-         <mat-card-actions 
-  class="card-actions actions-right"
-  *ngIf="roleService.isAdmin()">
+         <mat-card-actions class="card-actions actions-right" *ngIf="roleService.isAdmin()">
 
   <button mat-button class="app-btn app-btn--primary"
     (click)="editCourse(course.id!); $event.stopPropagation()">

@@ -13,11 +13,9 @@ import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
 
-  // ✅ PUBLIC ROUTES FIRST
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
 
-  // ✅ PROTECTED ROUTES
   {
     path: 'courses',
     canActivate: [AuthGuard],
@@ -44,9 +42,7 @@ export const routes: Routes = [
 { path: 'admin-dashboard', redirectTo: 'courses', pathMatch: 'full' },
 { path: 'user-dashboard', redirectTo: 'courses', pathMatch: 'full' },
 
-  // ✅ DEFAULT ROUTE
   { path: '', redirectTo: 'courses', pathMatch: 'full' },
 
-  // ✅ WILDCARD LAST (important)
   { path: '**', redirectTo: 'courses' }
 ];
