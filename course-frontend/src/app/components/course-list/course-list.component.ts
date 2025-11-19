@@ -166,30 +166,32 @@ private handleLoadError() {
  loadCourses(): void {
   this.isLoading = true;
 
-  const requestBody: any = {
-    page: this.currentPage,
-    size: this.pageSize
-  };
+ const requestBody: any = {
+  page: this.currentPage,
+  size: this.pageSize
+};
 
-  if (this.searchTerm?.trim()) {
-    requestBody.searchText = this.searchTerm.trim();
-  }
+if (this.searchTerm?.trim()) {
+  requestBody.searchText = this.searchTerm.trim();
+}
 
-  if (this.filters.board) {
-    requestBody.boards = [this.filters.board];
-  }
+const isValid = (v: any) => v !== null && v !== undefined && v !== "";
 
-  if (this.filters.medium) {
-    requestBody.mediums = [this.filters.medium];
-  }
+if (isValid(this.filters.board)) {
+  requestBody.boards = [this.filters.board];
+}
 
-  if (this.filters.grade) {
-    requestBody.grades = [this.filters.grade];
-  }
+if (isValid(this.filters.medium)) {
+  requestBody.mediums = [this.filters.medium];
+}
 
-  if (this.filters.subject) {
-    requestBody.subjects = [this.filters.subject];
-  }
+if (isValid(this.filters.grade)) {
+  requestBody.grades = [this.filters.grade];
+}
+
+if (isValid(this.filters.subject)) {
+  requestBody.subjects = [this.filters.subject];
+}
 
   this.courseService.listCourses(requestBody).subscribe({
     next: (pageData) => {

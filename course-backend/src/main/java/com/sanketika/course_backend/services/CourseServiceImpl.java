@@ -151,17 +151,41 @@ public Object getCourseById(UUID id) {
                 predicates.add(root.get("board").in(request.getBoards()));
             }
 
-            if (request.getMediums() != null && !request.getMediums().isEmpty()) {
-                predicates.add(root.get("medium").in(request.getMediums()));
-            }
+if (request.getMediums() != null && !request.getMediums().isEmpty()) {
+    List<Predicate> mediumPreds = new ArrayList<>();
+    for (String m : request.getMediums()) {
+        if (m != null && !m.isBlank()) {
+            mediumPreds.add(cb.like(cb.lower(root.get("medium")), "%" + m.toLowerCase() + "%"));
+        }
+    }
+    if (!mediumPreds.isEmpty()) {
+        predicates.add(cb.or(mediumPreds.toArray(new Predicate[0])));
+    }
+}
 
-            if (request.getGrades() != null && !request.getGrades().isEmpty()) {
-                predicates.add(root.get("grade").in(request.getGrades()));
-            }
+if (request.getGrades() != null && !request.getGrades().isEmpty()) {
+    List<Predicate> gradePreds = new ArrayList<>();
+    for (String g : request.getGrades()) {
+        if (g != null && !g.isBlank()) {
+            gradePreds.add(cb.like(cb.lower(root.get("grade")), "%" + g.toLowerCase() + "%"));
+        }
+    }
+    if (!gradePreds.isEmpty()) {
+        predicates.add(cb.or(gradePreds.toArray(new Predicate[0])));
+    }
+}
 
-            if (request.getSubjects() != null && !request.getSubjects().isEmpty()) {
-                predicates.add(root.get("subject").in(request.getSubjects()));
-            }
+if (request.getSubjects() != null && !request.getSubjects().isEmpty()) {
+    List<Predicate> subjectPreds = new ArrayList<>();
+    for (String s : request.getSubjects()) {
+        if (s != null && !s.isBlank()) {
+            subjectPreds.add(cb.like(cb.lower(root.get("subject")), "%" + s.toLowerCase() + "%"));
+        }
+    }
+    if (!subjectPreds.isEmpty()) {
+        predicates.add(cb.or(subjectPreds.toArray(new Predicate[0])));
+    }
+}
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
