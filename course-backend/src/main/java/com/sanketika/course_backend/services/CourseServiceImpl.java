@@ -1,6 +1,7 @@
 package com.sanketika.course_backend.services;
 
 import com.sanketika.course_backend.dto.CourseDto;
+import com.sanketika.course_backend.dto.CourseListRequest;
 import com.sanketika.course_backend.dto.UnitDto;
 import com.sanketika.course_backend.entity.Course;
 import com.sanketika.course_backend.entity.Unit;
@@ -9,20 +10,29 @@ import com.sanketika.course_backend.mapper.CourseMapper;
 import com.sanketika.course_backend.repositories.CourseRepository;
 import com.sanketika.course_backend.repositories.UnitRepository;
 
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 // import org.slf4j.Logger;
 // import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 
+
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,28 +44,13 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepository courseRepository;
 
     @Autowired
+    private CacheManager cacheManager;
+    @Autowired
     private UnitRepository unitRepository;
 
     @Autowired
     private CourseMapper courseMapper;
 
-    @Override
-    @Cacheable(value = "courses", key = "'live'")
-    public List<CourseDto> getLiveCourses() {
-        return courseRepository.findByStatus("live")
-                .stream()
-                .map(courseMapper::toDto)
-                .toList();
-    }
-
-    @Override
-    @Cacheable(value = "courses", key = "'all'")
-    public List<CourseDto> getAllCourses() {
-        return courseRepository.findActiveCourses()
-                .stream()
-                .map(courseMapper::toDto)
-                .toList();
-    }
 
 @Override
 @Cacheable(value = "courses", key = "#id")
@@ -65,9 +60,6 @@ public Object getCourseById(UUID id) {
             .orElseThrow(() -> new ResourceNotFoundException("Course not found"))
     );
 }
-
-
-
     @Override
     @CacheEvict(value = "courses", allEntries = true)
     public CourseDto createCourse(CourseDto dto) {
@@ -125,5 +117,79 @@ public Object getCourseById(UUID id) {
 
         course.setDeleted(true);
         courseRepository.save(course);
+    }
+
+    @Override
+    public Page<CourseDto> listCourses(CourseListRequest request) {
+        // determine role-based statuses
+        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .anyMatch(a -> a.equals("ROLE_ADMIN"));
+
+        List<String> allowedStatuses = new ArrayList<>();
+        allowedStatuses.add("live");
+        if (isAdmin) {
+            allowedStatuses.add("draft");
+        }
+
+        Specification<Course> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(cb.isFalse(root.get("deleted")));
+
+            predicates.add(root.get("status").in(allowedStatuses));
+
+            if (request.getSearchText() != null && !request.getSearchText().isBlank()) {
+                String likePattern = "%" + request.getSearchText().toLowerCase() + "%";
+                Predicate nameLike = cb.like(cb.lower(root.get("name")), likePattern);
+                Predicate descLike = cb.like(cb.lower(root.get("description")), likePattern);
+                predicates.add(cb.or(nameLike, descLike));
+            }
+
+            if (request.getBoards() != null && !request.getBoards().isEmpty()) {
+                predicates.add(root.get("board").in(request.getBoards()));
+            }
+
+            if (request.getMediums() != null && !request.getMediums().isEmpty()) {
+                predicates.add(root.get("medium").in(request.getMediums()));
+            }
+
+            if (request.getGrades() != null && !request.getGrades().isEmpty()) {
+                predicates.add(root.get("grade").in(request.getGrades()));
+            }
+
+            if (request.getSubjects() != null && !request.getSubjects().isEmpty()) {
+                predicates.add(root.get("subject").in(request.getSubjects()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        int page = Math.max(0, request.getPage());
+        int size = Math.max(1, request.getSize());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<Course> coursePage = courseRepository.findAll(spec, pageable);
+
+        List<CourseDto> dtoList = coursePage.getContent().stream()
+                .map(course -> {
+                    UUID id = course.getId();
+                    Cache cache = cacheManager.getCache("courses");
+                    if (cache != null) {
+                        Cache.ValueWrapper wrapper = cache.get(id);
+                        if (wrapper != null && wrapper.get() instanceof CourseDto) {
+                            return (CourseDto) wrapper.get();
+                        }
+                    }
+                    CourseDto dto = courseMapper.toDto(course);
+                    if (cache != null) {
+                        cache.put(id, dto);
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, coursePage.getTotalElements());
     }
 }

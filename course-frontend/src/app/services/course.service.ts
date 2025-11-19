@@ -56,46 +56,10 @@ export class CourseService {
     };
   }
 
-  getAllCourses(
-    currentPage: number,
-    pageSize: number,
-    text?: string,
-    options?: { simple?: boolean }
-  ): Observable<any> {
-
-    const simple = options?.simple ?? false;
-
-    let url = `${this.baseUrl}/get?page=${currentPage}&size=${pageSize}`;
-    if (text && text.trim().length > 0) {
-      url += `&text=${encodeURIComponent(text)}`;
-    }
-
-    return this.http
-      .get<ApiEnvelope<any>>(url)
+   listCourses(body: any): Observable<any> {
+    return this.http.post<ApiEnvelope<any>>(`${this.baseUrl}/list`, body)
       .pipe(
-        map(res => this.normalize(res.result?.data, simple)),
-        catchError(this.handleError)
-      );
-  }
-
-  getLiveCourses(
-    currentPage: number,
-    pageSize: number,
-    text?: string,
-    options?: { simple?: boolean }
-  ): Observable<any> {
-
-    const simple = options?.simple ?? false;
-
-    let url = `${this.baseUrl}/get/live?page=${currentPage}&size=${pageSize}`;
-    if (text && text.trim().length > 0) {
-      url += `&text=${encodeURIComponent(text)}`;
-    }
-
-    return this.http
-      .get<ApiEnvelope<any>>(url)
-      .pipe(
-        map(res => this.normalize(res.result?.data, simple)),
+        map(res => res.result?.data),
         catchError(this.handleError)
       );
   }
@@ -103,35 +67,26 @@ export class CourseService {
   getCourseById(id: string): Observable<Course> {
     return this.http
       .get<ApiEnvelope<Course>>(`${this.baseUrl}/get/${id}`)
-      .pipe(
-        map(res => res.result?.data),
-        catchError(this.handleError)
-      );
+      .pipe(map(res => res.result?.data));
   }
 
   createCourse(course: Course): Observable<Course> {
     return this.http
       .post<ApiEnvelope<Course>>(`${this.baseUrl}/add`, course)
-      .pipe(
-        map(res => res.result?.data),
-        catchError(this.handleError)
-      );
+      .pipe(map(res => res.result?.data));
   }
 
   updateCourse(id: string, course: Course): Observable<Course> {
     return this.http
       .put<ApiEnvelope<Course>>(`${this.baseUrl}/update/${id}`, course)
-      .pipe(
-        map(res => res.result?.data),
-        catchError(this.handleError)
-      );
+      .pipe(map(res => res.result?.data));
   }
 
   deleteCourse(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/delete/${id}`);
   }
 
-  private handleError(error: HttpErrorResponse) {
+  private handleError(error: any) {
     console.error('HTTP Error:', error);
     return throwError(() => error);
   }

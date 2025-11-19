@@ -2,14 +2,13 @@ package com.sanketika.course_backend.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanketika.course_backend.dto.CourseDto;
+import com.sanketika.course_backend.dto.CourseListRequest;
 import com.sanketika.course_backend.mapper.ResponseMapper;
 import com.sanketika.course_backend.services.CourseService;
 import com.sanketika.course_backend.utils.ApiEnvelope;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,9 +25,6 @@ import java.util.UUID;
 @RequestMapping("/api/courses")
 public class CourseController {
 
-    // private static final Logger logger =
-    // LoggerFactory.getLogger(CourseController.class);
-
     @Autowired
     private CourseService courseService;
 
@@ -43,74 +39,10 @@ public class CourseController {
         return path.replace("/", ".").substring(1);
     }
 
-    @GetMapping("/get/live")
-    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getLiveCourses(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String text) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        List<?> raw = courseService.getLiveCourses();
-
-        List<CourseDto> allLiveCourses = redisObjectMapper.convertValue(
-                raw,
-                redisObjectMapper.getTypeFactory().constructCollectionType(List.class,
-                        CourseDto.class));
-
-        // FILTERING
-        List<CourseDto> filtered = (text == null || text.isBlank())
-                ? allLiveCourses
-                : allLiveCourses.stream()
-                        .filter(c -> (c.getName() != null && c
-                                .getName().toLowerCase().contains(text.toLowerCase()))
-                                ||
-                                (c.getDescription() != null && c.getDescription()
-                                        .toLowerCase()
-                                        .contains(text.toLowerCase())))
-                        .toList();
-
-        int start = Math.min(page * size, filtered.size());
-        int end = Math.min(start + size, filtered.size());
-
-        Page<CourseDto> paginated = new PageImpl<>(filtered.subList(start, end), pageable, filtered.size());
-
-        return ResponseEntity.ok(
-                ResponseMapper.success(autoId(), "Live courses fetched successfully", paginated));
-    }
-
-    @GetMapping("/get")
-    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> getAllCourses(
-            @RequestParam(required = false) String text,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        List<?> raw = courseService.getAllCourses();
-        List<CourseDto> allCourses = redisObjectMapper.convertValue(
-                raw,
-                redisObjectMapper.getTypeFactory().constructCollectionType(List.class,
-                        CourseDto.class));
-
-        List<CourseDto> filtered = (text == null || text.isBlank())
-                ? allCourses
-                : allCourses.stream()
-                        .filter(c -> (c.getName() != null && c
-                                .getName().toLowerCase().contains(text.toLowerCase()))
-                                ||
-                                (c.getDescription() != null && c.getDescription()
-                                        .toLowerCase()
-                                        .contains(text.toLowerCase())))
-                        .toList();
-
-        int start = Math.min(page * size, filtered.size());
-        int end = Math.min(start + size, filtered.size());
-
-        Page<CourseDto> paginated = new PageImpl<>(filtered.subList(start, end), pageable, filtered.size());
-
-        return ResponseEntity.ok(
-                ResponseMapper.success(autoId(), "All courses fetched successfully", paginated));
+    @PostMapping("/list")
+    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> listCourses(@RequestBody CourseListRequest requestBody) {
+        Page<CourseDto> page = courseService.listCourses(requestBody);
+        return ResponseEntity.ok(ResponseMapper.success(autoId(), "Courses fetched successfully", page));
     }
 
     @GetMapping("/get/{id}")

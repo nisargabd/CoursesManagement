@@ -163,65 +163,45 @@ private handleLoadError() {
 
 
 
-  loadCourses(): void {
+ loadCourses(): void {
   this.isLoading = true;
 
-  const isAdmin = this.roleService.isAdmin();
+  const requestBody: any = {
+    page: this.currentPage,
+    size: this.pageSize
+  };
 
-
-  if (this.searchMode || this.searchTerm || this.hasActiveFilters()) {
-    if (isAdmin) {
-    
-      this.courseService.getAllCourses(this.currentPage, this.pageSize,this.searchTerm).subscribe({
-        next: (courses) => {
-          this.courses = courses.content ?? [];
-this.totalElements = courses.totalElements ?? 0;
-
-          this.applyFilters();
-          this.totalElements = this.filteredCourses.length;
-          this.isLoading = false;
-        },
-        error: () => this.handleLoadError()
-      });
-    } else {
-     
-      this.courseService.getLiveCourses(this.currentPage, this.pageSize,this.searchTerm).subscribe({
-        next: (courses) => {
-          this.courses = courses.content || [];
-          this.applyFilters();
-          this.totalElements = this.filteredCourses.length;
-          this.isLoading = false;
-        },
-        error: () => this.handleLoadError()
-      });
-    }
-
-    return;
+  if (this.searchTerm?.trim()) {
+    requestBody.searchText = this.searchTerm.trim();
   }
-  if (isAdmin) {
-   
-    this.courseService.getAllCourses(this.currentPage, this.pageSize).subscribe({
-      next: (response) => {
-        this.courses = response.content || [];
-        this.filteredCourses = [...this.courses];
-        this.totalElements = response.totalElements || 0;
-        this.isLoading = false;
-      },
-      error: () => this.handleLoadError()
-    });
-  } else {
-  
-    this.courseService.getLiveCourses(this.currentPage, this.pageSize,this.searchTerm,{simple: true}).subscribe({
-      next: (response) => {
-        this.courses = response.content || [];
-        this.filteredCourses = [...this.courses];
-        this.totalElements = response.totalElements || 0;
-        this.isLoading = false;
-      },
-      error: () => this.handleLoadError()
-    });
+
+  if (this.filters.board) {
+    requestBody.boards = [this.filters.board];
   }
+
+  if (this.filters.medium) {
+    requestBody.mediums = [this.filters.medium];
+  }
+
+  if (this.filters.grade) {
+    requestBody.grades = [this.filters.grade];
+  }
+
+  if (this.filters.subject) {
+    requestBody.subjects = [this.filters.subject];
+  }
+
+  this.courseService.listCourses(requestBody).subscribe({
+    next: (pageData) => {
+      this.courses = pageData.content ?? [];
+      this.filteredCourses = [...this.courses];
+      this.totalElements = pageData.totalElements ?? 0;
+      this.isLoading = false;
+    },
+    error: () => this.handleLoadError()
+  });
 }
+
 
   hasActiveFilters(): boolean {
     return !!(this.filters.board || this.filters.medium || this.filters.grade || this.filters.subject);
@@ -277,13 +257,13 @@ if (this.searchTerm) {
   }
 
   onSearchChange(): void {
-    this.searchMode = !!this.searchTerm;
+    // this.searchMode = !!this.searchTerm;
     this.currentPage = 0; 
     this.loadCourses();
   }
 
   onFilterChange(): void {
-    this.searchMode = this.hasActiveFilters();
+    // this.searchMode = this.hasActiveFilters();
     this.currentPage = 0; 
     this.loadCourses();
   }
@@ -291,7 +271,7 @@ if (this.searchTerm) {
   clearFilters(): void {
     this.searchTerm = '';
     this.filters = {};
-    this.searchMode = false;
+    // this.searchMode = false;
     this.currentPage = 0;
     this.loadCourses();
   }
