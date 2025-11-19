@@ -21,13 +21,10 @@ public class CourseDto implements Serializable {
     @NotBlank(message = "Board cannot be empty or null")
     private String board;
 
-//    @NotBlank(message = "Medium list cannot be empty or null")
     private List<String> medium;
 
-//    @NotBlank(message = "Grade list cannot be empty or null")
     private List<String> grade;
 
-//    @NotBlank(message = "Subject list cannot be empty or null")
     private List<String> subject;
 
     private List<UnitDto> units;

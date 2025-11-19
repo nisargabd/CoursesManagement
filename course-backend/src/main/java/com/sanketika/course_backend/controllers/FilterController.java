@@ -59,7 +59,6 @@ public class FilterController {
   @GetMapping("/options")
 public ResponseEntity<FilterOptionsDto> getFilterOptions() {
 
-    // Load all values directly from enums
     List<String> boards = Arrays.stream(Board.values())
             .map(Board::getDisplayName)
             .toList();

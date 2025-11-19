@@ -29,7 +29,6 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
         try {
             return objectMapper.readValue(json, new com.fasterxml.jackson.core.type.TypeReference<List<String>>() {});
         } catch (IOException e) {
-            // Log and return empty list instead of failing the query
             System.err.println("Failed to parse JSON to List<String>: " + json);
             return new ArrayList<>();
         }

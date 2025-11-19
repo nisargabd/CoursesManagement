@@ -10,8 +10,8 @@ import com.sanketika.course_backend.repositories.CourseRepository;
 import com.sanketika.course_backend.repositories.UnitRepository;
 
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +28,7 @@ import java.util.UUID;
 @Transactional
 public class CourseServiceImpl implements CourseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+    // private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     @Autowired
     private CourseRepository courseRepository;

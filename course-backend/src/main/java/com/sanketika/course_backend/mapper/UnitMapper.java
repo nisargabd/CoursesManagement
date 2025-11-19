@@ -21,10 +21,8 @@ public class UnitMapper {
     public Unit toEntity(UnitDto dto) {
         if (dto == null) return null;
         Unit unit = new Unit();
-        // Don't set ID - let JPA generate it for new entities
         unit.setTitle(dto.getTitle());
         unit.setContent(dto.getContent());
-        // Course relationship is set in the service layer if needed
         return unit;
     }
 }

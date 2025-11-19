@@ -44,14 +44,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
-                // token invalid / expired / malformed => respond 401
                 logger.warn("Invalid JWT token: {}");
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT token");
                 return;
             } catch (Exception e) {
-                // unexpected error parsing token: log and continue WITHOUT authenticating
                 logger.error("Unexpected error in JWT filter: ", e);
-                // do NOT rethrow; continue so Spring can handle auth (will typically return 401)
+                
             }
         }
 

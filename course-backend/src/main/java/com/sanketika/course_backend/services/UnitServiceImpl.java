@@ -45,15 +45,17 @@ public class UnitServiceImpl implements UnitService {
                 .map(unitMapper::toDto)
                 .collect(Collectors.toList());
     }
-@Cacheable(value = "units",key = "#id")
+
+    @Cacheable(value = "units", key = "#id")
     @Override
     public UnitDto getUnitById(UUID id) {
-            Unit unit = unitRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Unit not found"));
-    logger.info("Fetching course from DB with id {}", id);
-            return unitMapper.toDto(unit);
-        }
-@CachePut(value = "units",key = "#id")
+        Unit unit = unitRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Unit not found"));
+        logger.info("Fetching course from DB with id {}", id);
+        return unitMapper.toDto(unit);
+    }
+
+    @CachePut(value = "units", key = "#id")
     @Override
     public UnitDto updateUnit(UUID id, UnitDto dto) {
         Unit existing = unitRepository.findById(id)
@@ -69,31 +71,32 @@ public class UnitServiceImpl implements UnitService {
         }
 
         Unit updated = unitRepository.save(existing);
-        logger.info("Updating course with id {}",id);
+        logger.info("Updating course with id {}", id);
         return unitMapper.toDto(updated);
     }
 
     @Override
-    public UnitDto createUnit(UnitDto dto){
+    public UnitDto createUnit(UnitDto dto) {
         Unit unit = unitMapper.toEntity(dto);
-        
+
         // Set course relationship if courseId is provided
         if (dto.getCourseId() != null) {
             Course course = courseRepository.findById(dto.getCourseId())
                     .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
             unit.setCourse(course);
         }
-        
+
         Unit saved = unitRepository.save(unit);
         logger.info("Created new unit with id {}", saved.getId());
         return unitMapper.toDto(saved);
     }
-@CacheEvict(value = "units",key = "#id")
+
+    @CacheEvict(value = "units", key = "#id")
     @Override
     public void deleteUnit(UUID id) {
         Unit unit = unitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Unit not found"));
-    logger.info("Deleting course with id {}", id);
+        logger.info("Deleting course with id {}", id);
         unitRepository.delete(unit);
 
     }

@@ -24,7 +24,7 @@ export class FilterOptionsService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Get all filter options
+
   getFilterOptions(): Observable<FilterOptions> {
     return this.http
       .get<FilterOptions>(`${this.baseUrl}/filters/options`)
@@ -38,14 +38,12 @@ export class FilterOptionsService {
       );
   }
 
-  // ✅ Boards
   getBoards(): Observable<string[]> {
     return this.http
       .get<string[]>(`${this.baseUrl}/filters/boards`)
       .pipe(map(data => this.makeDistinct(this.flattenResponse(data))));
   }
 
-  // ✅ Mediums based on board
   getMediums(board: string): Observable<string[]> {
     const body: FilterRequest = { board };
     return this.http
@@ -53,7 +51,6 @@ export class FilterOptionsService {
       .pipe(map(data => this.makeDistinct(this.flattenResponse(data))));
   }
 
-  // ✅ Grades based on board + medium
   getGrades(board: string, mediums: string[]): Observable<string[]> {
     const body: FilterRequest = { board, medium: mediums };
     return this.http
@@ -61,7 +58,7 @@ export class FilterOptionsService {
       .pipe(map(data => this.makeDistinct(this.flattenResponse(data))));
   }
 
-  // ✅ Subjects based on board + medium + grade
+
   getSubjects(board: string, mediums: string[], grades: string[]): Observable<string[]> {
     const body: FilterRequest = { board, medium: mediums, grade: grades };
     return this.http
@@ -69,7 +66,7 @@ export class FilterOptionsService {
       .pipe(map(data => this.makeDistinct(this.flattenResponse(data))));
   }
 
-  // ✅ Aliases (optional but safe to keep)
+
   getMediumsByBoard(request: any): Observable<string[]> {
     return this.http
       .post<string[]>(`${this.baseUrl}/filters/mediums`, request)
@@ -88,10 +85,6 @@ export class FilterOptionsService {
       .pipe(map(data => this.makeDistinct(this.flattenResponse(data))));
   }
 
-  /**
-   * ✅ Flatten nested/encoded responses.
-   * Handles cases like ["[\"9\",\"10\"]"] → ["9","10"]
-   */
   private flattenResponse = (data: any): string[] => {
     if (!data) return [];
     if (!Array.isArray(data)) return [String(data)];
@@ -115,9 +108,6 @@ export class FilterOptionsService {
     });
   };
 
-  /**
-   * ✅ Remove duplicates safely (forces to string before trimming)
-   */
   private makeDistinct = (arr: any[]): string[] => {
     return [...new Set(arr.map(a => String(a).trim()))];
   };

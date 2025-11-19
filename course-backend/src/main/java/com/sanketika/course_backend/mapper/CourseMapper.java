@@ -50,7 +50,7 @@ public class CourseMapper {
 
         if (dto.getUnits() != null) {
             List<Unit> units = dto.getUnits().stream()
-                    .map(u -> toEntity(u, course)) // pass parent reference
+                    .map(u -> toEntity(u, course)) 
                     .collect(Collectors.toList());
             course.setUnits(units);
         }
@@ -77,7 +77,7 @@ public class CourseMapper {
         unit.setId(dto.getId());
         unit.setTitle(dto.getTitle());
         unit.setContent(dto.getContent());
-        unit.setCourse(course); // ✅ fixes courseId = null
+        unit.setCourse(course); 
         return unit;
     }
 }
