@@ -47,9 +47,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Correct converter for Spring Boot 3.x with Keycloak roles
-     */
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -59,10 +56,6 @@ public class SecurityConfig {
         return converter;
     }
 
-    /**
-     * Map Keycloak roles -> Spring GrantedAuthority
-     * EXACT type: Collection<GrantedAuthority>
-     */
     private Collection<GrantedAuthority> mapRoles(Jwt jwt) {
 
         Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
@@ -74,7 +67,6 @@ public class SecurityConfig {
         @SuppressWarnings("unchecked")
         List<String> roles = (List<String>) realmAccess.get("roles");
 
-        // Convert to EXACT type: Collection<GrantedAuthority>
         return roles.stream()
                 .map(role -> {
                     String roleName = role.toUpperCase();
@@ -90,7 +82,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4800"));
+        config.setAllowedOrigins(List.of("http://localhost:4800","http://localhost:4200"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);

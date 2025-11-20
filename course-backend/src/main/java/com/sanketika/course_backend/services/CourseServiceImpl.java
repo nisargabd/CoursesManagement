@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CourseServiceImpl implements CourseService {
 
-    // private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     @Autowired
     private CourseRepository courseRepository;
@@ -121,7 +120,6 @@ public Object getCourseById(UUID id) {
 
     @Override
     public Page<CourseDto> listCourses(CourseListRequest request) {
-        // determine role-based statuses
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication() != null &&
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)

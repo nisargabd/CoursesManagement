@@ -36,13 +36,10 @@ export class KeycloakService {
       });
   }
 
-  /**
-   * Automatically refresh tokens before expiry
-   */
   private startTokenRefresh() {
     setInterval(() => {
       this.keycloak
-        .updateToken(30) // refresh when 30s left
+        .updateToken(30) 
         .then(refreshed => {
           if (refreshed) {
             this.syncLocalStorage();
