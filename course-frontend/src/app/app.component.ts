@@ -13,4 +13,8 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent {
   title = 'Course Management System';
+
+  constructor() {
+    console.log('AppComponent initialized');
+  }
 }

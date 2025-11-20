@@ -48,7 +48,7 @@ export class CourseListComponent implements OnInit {
   filteredCourses: Course[] = [];
   searchTerm: string = '';
   filters: CourseFilter = {};
- 
+
   totalElements: number = 0;
   pageSize: number = 6;
   currentPage: number = 0;
@@ -63,13 +63,13 @@ export class CourseListComponent implements OnInit {
 
   constructor(
     private courseService: CourseService,
-    
+
     private filterOptionsService: FilterOptionsService,
     private router: Router,
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     public roleService: RoleService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadFilterOptions();
@@ -90,11 +90,11 @@ export class CourseListComponent implements OnInit {
       error: (error) => {
         console.error('Error loading filter options:', error);
         // Fallback to hardcoded values if API fails
-        this.boardOptions = ['State', 'CBSE', 'ICSE',"XYZ"];
+        this.boardOptions = ['State', 'CBSE', 'ICSE', "XYZ"];
         this.mediumOptions = ['English', 'Kannada', 'Hindi', 'Telugu'];
         this.gradeOptions = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
         this.subjectOptions = [
-          'English', 'Kannada', 'Hindi', 'Maths', 'Science', 'Social', 
+          'English', 'Kannada', 'Hindi', 'Maths', 'Science', 'Social',
           'Physics', 'Chemistry', 'Biology', 'History', 'Geography', 'Civics', 'Computer'
         ];
         this.filterOptionsLoading = false;
@@ -107,102 +107,102 @@ export class CourseListComponent implements OnInit {
     });
   }
   onBoardChange(): void {
-  if (this.filters.board) {
-    const req = { board: this.filters.board };
-    this.filterOptionsService.getMediumsByBoard(req).subscribe({
-      next: (mediums) => {
-        this.mediumOptions = mediums;
-        this.filters.medium = '';
-        this.gradeOptions = [];
-        this.subjectOptions = [];
-      },
-      error: (err) => console.error('Error fetching mediums:', err)
-    });
+    if (this.filters.board) {
+      const req = { board: this.filters.board };
+      this.filterOptionsService.getMediumsByBoard(req).subscribe({
+        next: (mediums) => {
+          this.mediumOptions = mediums;
+          this.filters.medium = '';
+          this.gradeOptions = [];
+          this.subjectOptions = [];
+        },
+        error: (err) => console.error('Error fetching mediums:', err)
+      });
+    }
   }
-}
 
-onMediumChange(): void {
-  if (this.filters.board && this.filters.medium) {
-    const req = {
-      board: this.filters.board,
-      medium: [this.filters.medium]
+  onMediumChange(): void {
+    if (this.filters.board && this.filters.medium) {
+      const req = {
+        board: this.filters.board,
+        medium: [this.filters.medium]
+      };
+      this.filterOptionsService.getGradesByBoardAndMedium(req).subscribe({
+        next: (grades) => {
+          this.gradeOptions = grades;
+          this.filters.grade = '';
+          this.subjectOptions = [];
+        },
+        error: (err) => console.error('Error fetching grades:', err)
+      });
+    }
+  }
+
+  onGradeChange(): void {
+    if (this.filters.board && this.filters.medium && this.filters.grade) {
+      const req = {
+        board: this.filters.board,
+        medium: [this.filters.medium],
+        grade: [this.filters.grade]
+      };
+      this.filterOptionsService.getSubjectsByBoardMediumAndGrade(req).subscribe({
+        next: (subjects) => {
+          this.subjectOptions = subjects;
+        },
+        error: (err) => console.error('Error fetching subjects:', err)
+      });
+    }
+  }
+  private handleLoadError() {
+    console.error('Error loading courses');
+    this.courses = [];
+    this.filteredCourses = [];
+    this.totalElements = 0;
+    this.isLoading = false;
+  }
+
+
+
+  loadCourses(): void {
+    this.isLoading = true;
+
+    const requestBody: any = {
+      page: this.currentPage,
+      size: this.pageSize
     };
-    this.filterOptionsService.getGradesByBoardAndMedium(req).subscribe({
-      next: (grades) => {
-        this.gradeOptions = grades;
-        this.filters.grade = '';
-        this.subjectOptions = [];
+
+    if (this.searchTerm?.trim()) {
+      requestBody.searchText = this.searchTerm.trim();
+    }
+
+    const isValid = (v: any) => v !== null && v !== undefined && v !== "";
+
+    if (isValid(this.filters.board)) {
+      requestBody.boards = [this.filters.board];
+    }
+
+    if (isValid(this.filters.medium)) {
+      requestBody.mediums = [this.filters.medium];
+    }
+
+    if (isValid(this.filters.grade)) {
+      requestBody.grades = [this.filters.grade];
+    }
+
+    if (isValid(this.filters.subject)) {
+      requestBody.subjects = [this.filters.subject];
+    }
+
+    this.courseService.listCourses(requestBody).subscribe({
+      next: (pageData) => {
+        this.courses = pageData.content ?? [];
+        this.filteredCourses = [...this.courses];
+        this.totalElements = pageData.totalElements ?? 0;
+        this.isLoading = false;
       },
-      error: (err) => console.error('Error fetching grades:', err)
+      error: () => this.handleLoadError()
     });
   }
-}
-
-onGradeChange(): void {
-  if (this.filters.board && this.filters.medium && this.filters.grade) {
-    const req = {
-      board: this.filters.board,
-      medium: [this.filters.medium],
-      grade: [this.filters.grade]
-    };
-    this.filterOptionsService.getSubjectsByBoardMediumAndGrade(req).subscribe({
-      next: (subjects) => {
-        this.subjectOptions = subjects;
-      },
-      error: (err) => console.error('Error fetching subjects:', err)
-    });
-  }
-}
-private handleLoadError() {
-  console.error('Error loading courses');
-  this.courses = [];
-  this.filteredCourses = [];
-  this.totalElements = 0;
-  this.isLoading = false;
-}
-
-
-
- loadCourses(): void {
-  this.isLoading = true;
-
- const requestBody: any = {
-  page: this.currentPage,
-  size: this.pageSize
-};
-
-if (this.searchTerm?.trim()) {
-  requestBody.searchText = this.searchTerm.trim();
-}
-
-const isValid = (v: any) => v !== null && v !== undefined && v !== "";
-
-if (isValid(this.filters.board)) {
-  requestBody.boards = [this.filters.board];
-}
-
-if (isValid(this.filters.medium)) {
-  requestBody.mediums = [this.filters.medium];
-}
-
-if (isValid(this.filters.grade)) {
-  requestBody.grades = [this.filters.grade];
-}
-
-if (isValid(this.filters.subject)) {
-  requestBody.subjects = [this.filters.subject];
-}
-
-  this.courseService.listCourses(requestBody).subscribe({
-    next: (pageData) => {
-      this.courses = pageData.content ?? [];
-      this.filteredCourses = [...this.courses];
-      this.totalElements = pageData.totalElements ?? 0;
-      this.isLoading = false;
-    },
-    error: () => this.handleLoadError()
-  });
-}
 
 
   hasActiveFilters(): boolean {
@@ -210,21 +210,21 @@ if (isValid(this.filters.subject)) {
   }
 
   applyFilters(): void {
-  
+
     if (!Array.isArray(this.courses)) {
       this.courses = [];
     }
-    
-    this.filteredCourses = this.courses.filter(course => {
-     
-if (this.searchTerm) {
-  const searchLower = this.searchTerm.toLowerCase();
-  const name = (course.name || '').toLowerCase();
-  const desc = (course.description || '').toLowerCase();
 
-  const matchesSearch = name.includes(searchLower) || desc.includes(searchLower);
-  if (!matchesSearch) return false;
-}
+    this.filteredCourses = this.courses.filter(course => {
+
+      if (this.searchTerm) {
+        const searchLower = this.searchTerm.toLowerCase();
+        const name = (course.name || '').toLowerCase();
+        const desc = (course.description || '').toLowerCase();
+
+        const matchesSearch = name.includes(searchLower) || desc.includes(searchLower);
+        if (!matchesSearch) return false;
+      }
 
 
       // Board filter
@@ -260,13 +260,13 @@ if (this.searchTerm) {
 
   onSearchChange(): void {
     // this.searchMode = !!this.searchTerm;
-    this.currentPage = 0; 
+    this.currentPage = 0;
     this.loadCourses();
   }
 
   onFilterChange(): void {
     // this.searchMode = this.hasActiveFilters();
-    this.currentPage = 0; 
+    this.currentPage = 0;
     this.loadCourses();
   }
 
@@ -288,7 +288,7 @@ if (this.searchTerm) {
 
   onPageSizeChange(newPageSize: number): void {
     this.pageSize = newPageSize;
-    this.currentPage = 0; 
+    this.currentPage = 0;
     if (!this.searchMode) {
       this.loadCourses();
     }
@@ -343,33 +343,33 @@ if (this.searchTerm) {
     }
   }
 
- getPageNumbers(): (number | string)[] {
-  const total = this.getTotalPages();
-  const current = this.currentPage;
+  getPageNumbers(): (number | string)[] {
+    const total = this.getTotalPages();
+    const current = this.currentPage;
 
-  if (total <= 6) {
-    return Array.from({ length: total }, (_, i) => i);
+    if (total <= 6) {
+      return Array.from({ length: total }, (_, i) => i);
+    }
+
+    const pages: (number | string)[] = [];
+
+    pages.push(0);
+
+    if (current > 2) pages.push('...');
+
+    const start = Math.max(1, current - 1);
+    const end = Math.min(total - 2, current + 1);
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (current < total - 3) pages.push('...');
+
+    pages.push(total - 1);
+
+    return pages;
   }
-
-  const pages: (number | string)[] = [];
-
-  pages.push(0);
-
-  if (current > 2) pages.push('...');
-
-  const start = Math.max(1, current - 1);
-  const end = Math.min(total - 2, current + 1);
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-
-  if (current < total - 3) pages.push('...');
-
-  pages.push(total - 1);
-
-  return pages;
-}
 
 
   goToPage(page: number | string): void {
@@ -381,16 +381,16 @@ if (this.searchTerm) {
     }
   }
   onCustomPageSizeChange(): void {
-  if (!this.pageSize || this.pageSize < 1) {
-    this.pageSize = 6;
-  }
+    if (!this.pageSize || this.pageSize < 1) {
+      this.pageSize = 6;
+    }
 
-  this.currentPage = 0;
+    this.currentPage = 0;
 
-  if (!this.searchMode) {
-    this.loadCourses();
+    if (!this.searchMode) {
+      this.loadCourses();
+    }
   }
-}
 
 
   getDisplayedCourses(): Course[] {
@@ -414,10 +414,13 @@ if (this.searchTerm) {
     this.router.navigate(['/courses/add']);
   }
 
+  login(): void {
+    this.roleService.login();
+  }
+
   logout() {
-  localStorage.clear();
-  this.router.navigate(['/login']);
-}
+    this.roleService.logout();
+  }
 
 
   deleteCourse(courseId: string): void {
@@ -457,7 +460,7 @@ if (this.searchTerm) {
 
   getRandomCourseImage(course: Course): string {
     const seed = this.hashCode(course.name + course.id);
-    const designIndex = Math.abs(seed) % 12; 
+    const designIndex = Math.abs(seed) % 12;
     return this.getDesignPattern(designIndex);
   }
 
@@ -485,7 +488,7 @@ if (this.searchTerm) {
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; 
+      hash = hash & hash;
     }
     return hash;
   }

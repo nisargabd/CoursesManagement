@@ -1,48 +1,39 @@
-import { Routes } from '@angular/router';
-
-import { CourseListComponent } from './components/course-list/course-list.component';
-import { CourseDetailComponent } from './components/course-detail/course-detail.component';
-import { CourseFormComponent } from './components/course-form/course-form.component';
-import { UnitFormComponent } from './components/unit-form/unit-form.component';
-
-import { RegisterComponent } from './components/register/register.component';
-
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
-import { LoginComponent } from './components/login/login.component';
-import { AdminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
-
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
   {
     path: 'courses',
-    canActivate: [AuthGuard],
-    children: [
-      { path: '', component: CourseListComponent },
-      { path: 'view/:id', component: CourseDetailComponent },
-      { path: 'edit/:id', component: CourseFormComponent },
-      { path: 'add', component: CourseFormComponent },
-      { path: 'unit', component: UnitFormComponent }
-      
-    ]
+    loadComponent: () => import('./components/course-list/course-list.component').then(m => m.CourseListComponent)
+    // Removed AuthGuard to allow public access
   },
   {
-  path: 'add-course',
-  component: CourseListComponent,
-  canActivate: [AdminGuard]
-},
-{
-  path: 'edit-course/:id',
-  component: CourseListComponent,
-  canActivate: [AdminGuard]
-},
-
-{ path: 'admin-dashboard', redirectTo: 'courses', pathMatch: 'full' },
-{ path: 'user-dashboard', redirectTo: 'courses', pathMatch: 'full' },
-
-  { path: '', redirectTo: 'courses', pathMatch: 'full' },
-
-  { path: '**', redirectTo: 'courses' }
+    path: 'courses/add',
+    loadComponent: () => import('./components/course-form/course-form.component').then(m => m.CourseFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/view/:id',
+    loadComponent: () => import('./components/course-detail/course-detail.component').then(m => m.CourseDetailComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'courses/edit/:id',
+    loadComponent: () => import('./components/course-form/course-form.component').then(m => m.CourseFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'login',
+    loadComponent: () => import('./components/login-redirect/login-redirect.component').then(m => m.LoginRedirectComponent)
+  },
+  // Removed login and register routes
+  { path: '**', redirectTo: '/courses' }
 ];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

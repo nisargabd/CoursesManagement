@@ -83,8 +83,24 @@
   Add New Course
 </button>
 
-  <!-- Logout Button -->
-  <button mat-stroked-button color="warn" class="logout-btn" (click)="logout()">
+  <!-- Login Button (Visible when NOT logged in) -->
+  <button 
+    *ngIf="!roleService.isUser() && !roleService.isAdmin()"
+    mat-stroked-button 
+    color="primary" 
+    class="login-btn" 
+    (click)="login()">
+    <mat-icon>login</mat-icon>
+    Login
+  </button>
+
+  <!-- Logout Button (Visible when logged in) -->
+  <button 
+    *ngIf="roleService.isUser() || roleService.isAdmin()"
+    mat-stroked-button 
+    color="warn" 
+    class="logout-btn" 
+    (click)="logout()">
     <mat-icon>logout</mat-icon>
     Logout
   </button>
