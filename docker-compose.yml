@@ -38,6 +38,7 @@ services:
       - "8080:8080"
     volumes:
       - keycloak_data:/opt/keycloak/data
+      - ./themes:/opt/keycloak/themes
     networks:
       - course
     restart: unless-stopped
@@ -55,7 +56,7 @@ services:
       SPRING_DATA_REDIS_HOST: course_redis
       SPRING_DATA_REDIS_PORT: 6379
       KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
-      KEYCLOAK_REALM: course-realm
+      KEYCLOAK_REALM: CourseManagement
       KEYCLOAK_RESOURCE: course-frontend
 
     ports:

@@ -9,7 +9,7 @@ export class KeycloakService {
   init(): Promise<boolean> {
     this.keycloak = new Keycloak({
       url: 'http://localhost:8080',
-      realm: 'course-realm',
+      realm: 'CourseManagement',
       clientId: 'course-angular',
     });
 

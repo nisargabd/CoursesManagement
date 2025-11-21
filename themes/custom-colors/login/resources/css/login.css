@@ -1,0 +1,120 @@
+.login-pf-page {
+  background-color: lightblue;
+  padding-top: 20px;
+}
+
+.login-pf body {
+  background: lightblue !important;
+  background-size: auto !important;
+}
+
+/* COURSE-REALM header - Bold and color-matched */
+.login-pf #kc-header-wrapper {
+  color: #1a5490 !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+  letter-spacing: 1px !important;
+}
+
+/* Login card - Black solid border with light gray background */
+.login-pf .card-pf {
+  /* background-color: lightgray !important; */
+  /* border: 2px solid #000000 !important; */
+  border-radius: 8px !important;
+  padding: 30px !important;
+  margin: auto !important;
+  width: 36% !important;
+  max-width: 90% !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Card header - Sign in to your account */
+.login-pf .card-pf h1,
+.login-pf .card-pf .kc-page-title {
+  color: #1a1a1a !important;
+  font-weight: 600 !important;
+  margin-bottom: 25px !important;
+}
+
+/* Input labels - BOLD */
+.login-pf label {
+  color: #2c2c2c !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  margin-bottom: 6px !important;
+}
+
+/* Input fields */
+.login-pf input[type="text"],
+.login-pf input[type="password"],
+.login-pf input[type="email"] {
+  border: 1px solid #999999 !important;
+  border-radius: 4px !important;
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+}
+
+/* Input field focus state */
+.login-pf input[type="text"]:focus,
+.login-pf input[type="password"]:focus,
+.login-pf input[type="email"]:focus {
+  border-color: #4a90e2 !important;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2) !important;
+  outline: none !important;
+}
+
+/* Primary button - Sign In */
+.login-pf .btn-primary {
+  background-color: #4a90e2 !important;
+  border-color: #4a90e2 !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  padding: 12px 20px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.login-pf .btn-primary:hover {
+  background-color: #357abd !important;
+  border-color: #357abd !important;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3) !important;
+}
+
+.login-pf .btn-primary:active,
+.login-pf .btn-primary:focus {
+  background-color: #2a5f99 !important;
+  border-color: #2a5f99 !important;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3) !important;
+}
+
+/* Register link - Simple hyperlink */
+#kc-registration {
+  margin-top: 20px !important;
+  text-align: center !important;
+}
+
+#kc-registration a {
+  color: #4a90e2 !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+#kc-registration a:hover {
+  color: #357abd !important;
+  text-decoration: underline !important;
+}
+
+/* Other links */
+.login-pf a:not(#kc-registration a) {
+  color: #4a90e2 !important;
+  font-weight: 500 !important;
+}
+
+.login-pf a:not(#kc-registration a):hover {
+  color: #357abd !important;
+  text-decoration: underline !important;
+}
