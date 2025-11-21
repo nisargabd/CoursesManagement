@@ -57,6 +57,11 @@
   font-size: 14px !important;
 }
 
+/* Password input - add padding for eye icon */
+.login-pf input[type="password"] {
+  padding-right: 45px !important;
+}
+
 /* Input field focus state */
 .login-pf input[type="text"]:focus,
 .login-pf input[type="password"]:focus,
@@ -64,6 +69,38 @@
   border-color: #4a90e2 !important;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2) !important;
   outline: none !important;
+}
+
+/* Password field wrapper - for eye icon positioning */
+.login-pf .pf-c-input-group,
+.login-pf .form-group {
+  position: relative !important;
+}
+
+/* Password eye icon - position INSIDE the field */
+.login-pf button[type="button"],
+.login-pf .pf-c-button.pf-m-control,
+.login-pf .pf-c-input-group button {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: transparent !important;
+  border: none !important;
+  color: #6c757d !important;
+  padding: 6px 8px !important;
+  cursor: pointer !important;
+  z-index: 10 !important;
+  height: auto !important;
+  width: auto !important;
+  min-width: auto !important;
+}
+
+.login-pf button[type="button"]:hover,
+.login-pf .pf-c-button.pf-m-control:hover,
+.login-pf .pf-c-input-group button:hover {
+  color: #495057 !important;
+  background: transparent !important;
 }
 
 /* Primary button - Sign In */
