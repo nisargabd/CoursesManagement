@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: course-backend:v2
+          image: course-backend:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 9099
