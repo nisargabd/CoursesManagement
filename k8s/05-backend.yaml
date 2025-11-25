@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: course-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: course-backend:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9099
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://course-db:5432/course_db
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: course-secrets
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: course-secrets
+                  key: POSTGRES_PASSWORD
+            - name: SPRING_DATA_REDIS_HOST
+              value: course-redis
+            - name: SPRING_DATA_REDIS_PORT
+              value: "6379"
+            - name: KEYCLOAK_AUTH_SERVER_URL
+              value: http://keycloak:8080
+            - name: KEYCLOAK_REALM
+              value: CourseManagement
+            - name: KEYCLOAK_RESOURCE
+              value: course-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: course-management
+spec:
+  type: NodePort
+  selector:
+    app: backend
+  ports:
+    - port: 9099
+      targetPort: 9099
+      nodePort: 30099
