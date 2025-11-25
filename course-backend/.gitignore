@@ -35,4 +35,5 @@ build/
 .git    
 
 
-/src/main/resources/keys/private_key.pem    
+/src/main/resources/keys/private_key.pem   
+/src/main/resources/keys/public_key.pem     

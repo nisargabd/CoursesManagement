@@ -21,3 +21,4 @@ course-backend/target/
 *.log
 
 docker-learning
+K8S_SETUP_EXPLAINED.md
