@@ -197,18 +197,23 @@ if (request.getSubjects() != null && !request.getSubjects().isEmpty()) {
         List<CourseDto> dtoList = coursePage.getContent().stream()
                 .map(course -> {
                     UUID id = course.getId();
-                    Cache cache = cacheManager.getCache("courses");
-                    if (cache != null) {
-                        Cache.ValueWrapper wrapper = cache.get(id);
-                        if (wrapper != null && wrapper.get() instanceof CourseDto) {
-                            return (CourseDto) wrapper.get();
+                    try {
+                        Cache cache = cacheManager.getCache("courses");
+                        if (cache != null) {
+                            Cache.ValueWrapper wrapper = cache.get(id);
+                            if (wrapper != null && wrapper.get() instanceof CourseDto) {
+                                return (CourseDto) wrapper.get();
+                            }
                         }
+                        CourseDto dto = courseMapper.toDto(course);
+                        if (cache != null) {
+                            cache.put(id, dto);
+                        }
+                        return dto;
+                    } catch (Exception ex) {
+                        // Redis unavailable - skip cache and return from DB
+                        return courseMapper.toDto(course);
                     }
-                    CourseDto dto = courseMapper.toDto(course);
-                    if (cache != null) {
-                        cache.put(id, dto);
-                    }
-                    return dto;
                 })
                 .collect(Collectors.toList());
 

@@ -3,6 +3,7 @@ package com.sanketika.course_backend.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sanketika.course_backend.dto.CourseDto;
 import com.sanketika.course_backend.dto.CourseListRequest;
+import com.sanketika.course_backend.dto.PageResponse;
 import com.sanketika.course_backend.mapper.ResponseMapper;
 import com.sanketika.course_backend.services.CourseService;
 import com.sanketika.course_backend.utils.ApiEnvelope;
@@ -14,12 +15,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
 
     @Autowired
     private CourseService courseService;
@@ -36,9 +41,24 @@ public class CourseController {
     }
 
     @PostMapping("/list")
-    public ResponseEntity<ApiEnvelope<Page<CourseDto>>> listCourses(@RequestBody CourseListRequest requestBody) {
+    public ResponseEntity<ApiEnvelope<PageResponse<CourseDto>>> listCourses(@RequestBody CourseListRequest requestBody) {
+        logger.debug("=== listCourses endpoint called ===");
+        logger.debug("Request body: {}", requestBody);
+        
         Page<CourseDto> page = courseService.listCourses(requestBody);
-        return ResponseEntity.ok(ResponseMapper.success(autoId(), "Courses fetched successfully", page));
+        logger.debug("Service returned page with {} elements, total elements: {}", 
+                     page.getNumberOfElements(), page.getTotalElements());
+        
+        // Convert Page to PageResponse for proper JSON serialization
+        PageResponse<CourseDto> pageResponse = PageResponse.from(page);
+        logger.debug("PageResponse created with {} content items", pageResponse.getContent().size());
+        
+        ApiEnvelope<PageResponse<CourseDto>> response = ResponseMapper.success(autoId(), "Courses fetched successfully", pageResponse);
+        logger.debug("Response envelope created: id={}, responseCode={}", 
+                     response.getId(), response.getResponseCode());
+        logger.debug("Response result: {}", response.getResult());
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/get/{id}")

@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: course_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: course_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - course
+    restart: unless-stopped
+
+  keycloak:
+    image: sunbird_test
+    container_name: sunbird_keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+
+      KC_DB: postgres
+      KC_DB_URL_HOST: db
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: course_db
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: root
+
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - course
+    restart: unless-stopped
+
+networks:
+  course:
+    driver: bridge
+
+volumes:
+  db_data:

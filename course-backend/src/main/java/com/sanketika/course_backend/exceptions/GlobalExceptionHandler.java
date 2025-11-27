@@ -24,16 +24,6 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // -----------------------------
-    // ✅ Handle Redis Connection Failures
-    // -----------------------------
-    @ExceptionHandler({RedisConnectionFailureException.class, DataAccessResourceFailureException.class})
-    public void handleRedisUnavailable(Exception ex) {
-        logger.warn("⚠️ Redis unavailable, skipping cache and serving data from DB: {}", ex.getMessage());
-        // No ResponseEntity returned — allows controller to proceed
-    }
-
-
-    // -----------------------------
     // Handle resource not found
     // -----------------------------
     @ExceptionHandler(ResourceNotFoundException.class)

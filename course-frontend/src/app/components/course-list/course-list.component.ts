@@ -195,12 +195,19 @@ export class CourseListComponent implements OnInit {
 
     this.courseService.listCourses(requestBody).subscribe({
       next: (pageData) => {
-        this.courses = pageData.content ?? [];
+        console.log('[CourseListComponent] Received pageData:', pageData);
+        console.log('[CourseListComponent] pageData type:', typeof pageData);
+        console.log('[CourseListComponent] pageData.content:', pageData?.content);
+        this.courses = pageData?.content ?? [];
         this.filteredCourses = [...this.courses];
-        this.totalElements = pageData.totalElements ?? 0;
+        this.totalElements = pageData?.totalElements ?? 0;
         this.isLoading = false;
+        console.log('[CourseListComponent] Courses loaded:', this.courses.length);
       },
-      error: () => this.handleLoadError()
+      error: (err) => {
+        console.error('[CourseListComponent] Error:', err);
+        this.handleLoadError();
+      }
     });
   }
 
