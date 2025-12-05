@@ -1,0 +1,22 @@
+# Course endpoints
+POST   /api/courses/list         com.sanketika.controllers.CourseController.listCourses(request: Request)
+GET    /api/courses/get/:id      com.sanketika.controllers.CourseController.getCourseById(request: Request, id: java.util.UUID)
+POST   /api/courses/add          com.sanketika.controllers.CourseController.createCourse(request: Request)
+PUT    /api/courses/update/:id   com.sanketika.controllers.CourseController.updateCourse(request: Request, id: java.util.UUID)
+DELETE /api/courses/delete/:id   com.sanketika.controllers.CourseController.deleteCourse(request: Request, id: java.util.UUID)
+
+# Unit endpoints
+GET    /api/units                com.sanketika.controllers.UnitController.getAllUnits(request: Request)
+GET    /api/units/course/get/:courseId  com.sanketika.controllers.UnitController.getUnitsByCourse(request: Request, courseId: java.util.UUID)
+GET    /api/units/get/:id        com.sanketika.controllers.UnitController.getUnitById(request: Request, id: java.util.UUID)
+POST   /api/units/add            com.sanketika.controllers.UnitController.createUnit(request: Request)
+PUT    /api/units/update/:id     com.sanketika.controllers.UnitController.updateUnit(request: Request, id: java.util.UUID)
+DELETE /api/units/delete/:id     com.sanketika.controllers.UnitController.deleteUnit(request: Request, id: java.util.UUID)
+
+# Filter endpoints
+GET    /api/filters/boards       com.sanketika.controllers.FilterController.getBoards(request: Request)
+POST   /api/filters/mediums      com.sanketika.controllers.FilterController.getMediumsByBoard(request: Request)
+POST   /api/filters/grades       com.sanketika.controllers.FilterController.getGrades(request: Request)
+POST   /api/filters/subjects     com.sanketika.controllers.FilterController.getSubjects(request: Request)
+GET    /api/filters/options      com.sanketika.controllers.FilterController.getFilterOptions(request: Request)
+

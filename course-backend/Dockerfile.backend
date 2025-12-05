@@ -1,16 +1,41 @@
 # ---- Build Stage ----
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM eclipse-temurin:17-jdk-jammy AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn -q -DskipTests dependency:resolve
+
+# Install SBT
+RUN apt-get update && apt-get install -y curl && \
+    curl -L -o sbt-1.9.9.deb https://repo.scala-sbt.org/scalasbt/debian/sbt-1.9.9.deb && \
+    dpkg -i sbt-1.9.9.deb && \
+    rm sbt-1.9.9.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy build definition first to cache dependencies
+COPY build.sbt .
+COPY project project
+RUN sbt update
+
+# Copy the rest of the source code
 COPY . .
-RUN mvn -q -DskipTests package
+RUN sbt dist
 
 # ---- Runtime Stage ----
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-RUN apk add --no-cache curl
-COPY --from=build /app/target/*.jar app.jar
-COPY --from=build /app/.env /app/.env
+
+# Install unzip
+RUN apk add --no-cache unzip
+
+# Copy the build artifact from the build stage
+COPY --from=build /app/target/universal/course-backend-1.0.0.zip .
+
+# Unzip and clean up
+RUN unzip course-backend-1.0.0.zip && rm course-backend-1.0.0.zip
+
+# Expose the configured port
 EXPOSE 9099
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Start the application
+# -Dplay.http.secret.key should be overridden in production/k8s secrets
+# -Dhttp.port=9099 ensures it listens on the port expected by the k8s service
+ENTRYPOINT ["./course-backend-1.0.0/bin/course-backend", "-Dplay.http.secret.key=changeme", "-Dhttp.port=9099"]
