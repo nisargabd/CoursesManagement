@@ -33,7 +33,7 @@ public class AuthFilter extends Filter {
 
     @Inject
     public AuthFilter(Config config) {
-        super(null); // Materializer is not strictly needed for this simple filter structure in recent Play versions if we don't use it
+        super(null); 
         this.jwkSetUri = config.getString("security.jwt.jwk-set-uri");
     }
 
@@ -43,16 +43,8 @@ public class AuthFilter extends Filter {
             return next.apply(request);
         }
 
-        // Allow public endpoints (e.g. health, login if any)
-        // For now, we assume everything under /api requires auth, except maybe some specific ones.
-        // But the user said "Keep existing API URLs".
-        // We'll check Authorization header.
-
         Optional<String> authHeader = request.header("Authorization");
         if (authHeader.isEmpty() || !authHeader.get().startsWith("Bearer ")) {
-             // If it's a public path, let it pass. But we don't have the list of public paths easily.
-             // We'll fail by default for safety, unless it's a known public path.
-             // For now, fail.
              return CompletableFuture.completedFuture(Results.unauthorized("Missing or invalid Authorization header"));
         }
 

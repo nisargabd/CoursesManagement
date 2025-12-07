@@ -24,6 +24,7 @@ lazy val root = (project in file("."))
       "jakarta.persistence"     %  "jakarta.persistence-api" % "3.1.0",
       "org.hibernate.orm"       %  "hibernate-core"          % "6.4.4.Final",
       "jakarta.validation"      %  "jakarta.validation-api"  % "3.0.2",
+      "javax.validation"        %  "validation-api"          % "2.0.1.Final",
 
       // Redis
       "redis.clients"           %  "jedis"                   % "5.1.0",
